@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CBT Ujian Semester — UPTD SPF SMP N 1 KUTA BAHARU</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -74,7 +75,7 @@
     .form-group { flex: 1 1 200px; display: flex; flex-direction: column; gap: 5px; }
     .form-group label { font-size: 12px; font-weight: 600; color: #334155; }
 
-    input[type="text"], input[type="number"], input[type="password"], input[type="url"], input[type="search"], select, textarea {
+    input[type="text"], input[type="number"], input[type="password"], input[type="url"], input[type="search"], input[type="file"], select, textarea {
       width: 100%;
       padding: 9px 11px;
       border: 1px solid #cbd5e1;
@@ -87,7 +88,7 @@
     textarea { min-height: 80px; resize: vertical; }
     input:focus, select:focus, textarea:focus { outline: 2px solid #93c5fd; outline-offset: 1px; }
 
-    .inline-group { display: flex; gap: 8px; align-items: center; }
+    .inline-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
     /* Student Exam Screen */
     .exam-header {
@@ -241,7 +242,7 @@
         <p class="card-desc">Lengkapi identitas diri, pilih kelas, hari ujian, mata pelajaran, lalu masukkan token dari pengawas.</p>
 
         <div id="studentSyncHint" class="alert-warn">
-          <strong>Info Koneksi:</strong> Agar jawaban dari HP siswa langsung masuk ke Panel Admin guru, pastikan Guru/Admin sudah mengisi <strong>URL Google Apps Script Web App</strong> di menu Pengaturan Admin (atau bagikan link khusus dari menu Link &amp; Barcode Siswa).
+          <strong>Info Koneksi:</strong> Agar jawaban dari HP siswa langsung masuk ke Panel Admin guru, pastikan Guru/Admin sudah mengisi <strong>URL Google Apps Script Web App</strong> di menu Pengaturan Admin (atau bagikan link khusus dari menu Link Akses HP Siswa).
         </div>
 
         <form id="studentStartForm">
@@ -379,10 +380,10 @@
 
       <div class="admin-tabs">
         <button type="button" class="tab-btn active" data-admin-tab="admPaket">1. Paket Ujian &amp; Token</button>
-        <button type="button" class="tab-btn" data-admin-tab="admSoal">2. Tambah &amp; Edit Soal</button>
+        <button type="button" class="tab-btn" data-admin-tab="admSoal">2. Tambah, Edit &amp; Impor Word</button>
         <button type="button" class="tab-btn" data-admin-tab="admRekap">3. Rekap Nilai Siswa</button>
         <button type="button" class="tab-btn" data-admin-tab="admLink">4. Link Akses HP Siswa</button>
-        <button type="button" class="tab-btn" data-admin-tab="admPengaturan">5. Pengaturan Google Sheets</button>
+        <button type="button" class="tab-btn" data-admin-tab="admPengaturan">5. Pengaturan &amp; Sandi</button>
       </div>
 
       <!-- TAB 1: PAKET UJIAN -->
@@ -453,15 +454,37 @@
         </div>
       </div>
 
-      <!-- TAB 2: TAMBAH & EDIT SOAL -->
+      <!-- TAB 2: TAMBAH, EDIT & IMPOR WORD -->
       <div id="admSoal" class="admin-panel">
         <div class="card">
-          <h2>Kelola Butir Soal (Tambah / Edit / Hapus)</h2>
+          <h2>Pilih Paket Ujian &amp; Impor Soal dari Microsoft Word (.docx)</h2>
           <div class="form-group" style="max-width: 460px; margin-bottom: 14px;">
             <label for="selectPaketForSoal">Pilih Paket Ujian yang Dikelola:</label>
             <select id="selectPaketForSoal"></select>
           </div>
 
+          <div class="alert-info">
+            <strong>Impor Soal Sekaligus dari File Word (.docx):</strong><br />
+            Susun soal di Microsoft Word dengan format per soal (pisahkan antarsoal dengan baris kosong):<br />
+            <code>1. Ibu kota negara Indonesia adalah...</code><br />
+            <code>A. Bandung</code> | <code>B. Surabaya</code> | <code>C. Jakarta</code> | <code>D. Medan</code><br />
+            <code>KUNCI: C</code> (untuk Isian/Uraian tanpa opsi A-D, cukup tulis pertanyaan lalu <code>KUNCI: jawaban</code> atau tanpa <code>KUNCI:</code> untuk uraian).
+          </div>
+
+          <div class="form-row" style="align-items: flex-end;">
+            <div class="form-group" style="max-width: 360px;">
+              <label for="inputWordFile">Pilih Dokumen Word (.docx) dari Laptop:</label>
+              <input type="file" id="inputWordFile" accept=".docx" />
+            </div>
+            <div class="inline-group" style="margin-bottom: 5px;">
+              <button type="button" id="btnImportWord" class="btn btn-success">Impor Soal dari Word (.docx)</button>
+              <button type="button" id="btnDownloadWordTemplate" class="btn btn-secondary">Unduh Contoh Format (.txt)</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Tambah / Edit Butir Soal Manual</h2>
           <form id="formSaveSoal">
             <input type="hidden" id="editingSoalId" value="" />
             <div class="form-row">
@@ -650,17 +673,20 @@
         </div>
 
         <div class="card">
-          <h2>Ganti Password Admin</h2>
-          <form id="formChangePass" style="max-width: 400px;">
+          <h2>Ganti atau Reset Password Admin</h2>
+          <form id="formChangePass" style="max-width: 420px;">
             <div class="form-group" style="margin-bottom: 10px;">
               <label for="passOld">Password Saat Ini *</label>
-              <input type="password" id="passOld" required />
+              <input type="password" id="passOld" placeholder="Masukkan password saat ini" required />
             </div>
             <div class="form-group" style="margin-bottom: 10px;">
               <label for="passNew">Password Baru (Min. 4 Karakter) *</label>
-              <input type="password" id="passNew" minlength="4" required />
+              <input type="password" id="passNew" minlength="4" placeholder="Masukkan password baru" required />
             </div>
-            <button type="submit" class="btn btn-primary">Perbarui Password</button>
+            <div class="inline-group">
+              <button type="submit" class="btn btn-primary">Perbarui Password</button>
+              <button type="button" id="btnResetPasswordInPanel" class="btn btn-danger">Reset Sandi ke Bawaan</button>
+            </div>
           </form>
         </div>
       </div>
@@ -676,12 +702,15 @@
       </div>
       <form id="formAdminLogin">
         <div class="form-group" style="margin-bottom: 12px;">
-          <label for="adminPassInput">Password Admin (Default awal: admin)</label>
-          <input type="password" id="adminPassInput" placeholder="Masukkan password..." required />
+          <label for="adminPassInput">Password Admin</label>
+          <input type="password" id="adminPassInput" placeholder="Masukkan password admin..." required />
         </div>
-        <div style="display: flex; justify-content: flex-end; gap: 8px;">
-          <button type="button" class="btn btn-secondary" id="btnCancelLogin">Batal</button>
-          <button type="submit" class="btn btn-primary">Masuk</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btnForgotResetPass" class="btn btn-secondary btn-sm">Lupa / Reset Sandi</button>
+          <div class="inline-group">
+            <button type="button" class="btn btn-secondary" id="btnCancelLogin">Batal</button>
+            <button type="submit" class="btn btn-primary">Masuk</button>
+          </div>
         </div>
       </form>
     </div>
@@ -702,11 +731,12 @@
 
   <script>
     (function () {
-      const STORAGE_KEY = "cbt_smpn1_kutabaharu_v2";
+      const STORAGE_KEY = "cbt_smpn1_kutabaharu_v3";
       const SESSION_KEY = "cbt_smpn1_admin_logged_in";
+      const DEFAULT_ADMIN_PASS = "admin123";
 
       const defaultData = {
-        adminPassword: "admin",
+        adminPassword: DEFAULT_ADMIN_PASS,
         gasUrl: "",
         maxTab: 3,
         paketList: [
@@ -746,7 +776,7 @@
         el.textContent = msg;
         el.classList.add("show");
         clearTimeout(toast._t);
-        toast._t = setTimeout(() => el.classList.remove("show"), 3200);
+        toast._t = setTimeout(() => el.classList.remove("show"), 3500);
       }
 
       function saveLocal() {
@@ -763,19 +793,30 @@
           if (raw) {
             const parsed = JSON.parse(raw);
             appData = {
-              adminPassword: parsed.adminPassword || "admin",
+              adminPassword: parsed.adminPassword || DEFAULT_ADMIN_PASS,
               gasUrl: parsed.gasUrl || "",
               maxTab: Number(parsed.maxTab) || 3,
               paketList: Array.isArray(parsed.paketList) ? parsed.paketList : structuredClone(defaultData.paketList),
               soalList: Array.isArray(parsed.soalList) ? parsed.soalList : structuredClone(defaultData.soalList),
               rekapList: Array.isArray(parsed.rekapList) ? parsed.rekapList : []
             };
+          } else {
+            // Migrasi URL Google Sheets jika sebelumnya tersimpan di v2
+            const oldRaw = localStorage.getItem("cbt_smpn1_kutabaharu_v2");
+            if (oldRaw) {
+              const oldParsed = JSON.parse(oldRaw);
+              if (oldParsed && oldParsed.gasUrl) appData.gasUrl = oldParsed.gasUrl;
+              if (Array.isArray(oldParsed.paketList)) appData.paketList = oldParsed.paketList;
+              if (Array.isArray(oldParsed.soalList)) appData.soalList = oldParsed.soalList;
+              if (Array.isArray(oldParsed.rekapList)) appData.rekapList = oldParsed.rekapList;
+            }
+            appData.adminPassword = DEFAULT_ADMIN_PASS;
+            saveLocal();
           }
         } catch (e) {
           appData = structuredClone(defaultData);
         }
 
-        // Ambil URL Google Apps Script dari parameter link (?gas=...) jika dibuka siswa di HP
         const params = new URLSearchParams(window.location.search);
         const gasParam = params.get("gas");
         if (gasParam && gasParam.startsWith("http")) {
@@ -829,7 +870,7 @@
             })
           });
         } catch (e) {
-          // Tetap aman di localStorage
+          // Tetap tersimpan di localStorage
         }
       }
 
@@ -876,7 +917,7 @@
         }
       }
 
-      // ==================== NAVIGASI UTAMA & LOGIN ADMIN ====================
+      // ==================== NAVIGASI UTAMA, LOGIN & RESET SANDI ADMIN ====================
       document.getElementById("btnSwitchStudent").addEventListener("click", () => {
         if (activeExam) {
           toast("Selesaikan ujian terlebih dahulu.");
@@ -917,6 +958,27 @@
           toast("Berhasil masuk ke Panel Admin.");
         } else {
           toast("Password admin salah!");
+        }
+      });
+
+      function resetAdminPasswordToDefault() {
+        appData.adminPassword = DEFAULT_ADMIN_PASS;
+        saveLocal();
+        toast("Sandi admin berhasil di-reset ke sandi bawaan sistem.");
+      }
+
+      document.getElementById("btnForgotResetPass").addEventListener("click", () => {
+        if (confirm("Reset sandi Panel Admin di browser ini kembali ke sandi awal?")) {
+          resetAdminPasswordToDefault();
+          document.getElementById("adminPassInput").value = "";
+          document.getElementById("adminPassInput").focus();
+        }
+      });
+
+      document.getElementById("btnResetPasswordInPanel").addEventListener("click", () => {
+        if (confirm("Reset sandi Panel Admin kembali ke sandi awal?")) {
+          resetAdminPasswordToDefault();
+          document.getElementById("formChangePass").reset();
         }
       });
 
@@ -1119,7 +1181,6 @@
         }
       });
 
-      // Deteksi Pindah Tab
       document.addEventListener("visibilitychange", () => {
         if (document.hidden && activeExam) {
           activeExam.violations += 1;
@@ -1275,7 +1336,173 @@
         });
       }
 
-      // Tambah / Edit Soal
+      // ==================== IMPOR SOAL DARI MICROSOFT WORD (.DOCX) ====================
+      document.getElementById("btnDownloadWordTemplate").addEventListener("click", () => {
+        const contoh = [
+          "1. Hasil dari 12 x 5 adalah...",
+          "A. 50",
+          "B. 55",
+          "C. 60",
+          "D. 65",
+          "KUNCI: C",
+          "",
+          "2. Ibu kota Provinsi Aceh adalah...",
+          "A. Lhokseumawe",
+          "B. Banda Aceh",
+          "C. Meulaboh",
+          "D. Langsa",
+          "KUNCI: B",
+          "",
+          "3. Planet terbesar dalam tata surya adalah...",
+          "KUNCI: Jupiter",
+          "",
+          "4. Jelaskan secara singkat manfaat menjaga kebersihan lingkungan sekolah!"
+        ].join("\n");
+        const blob = new Blob([contoh], { type: "text/plain;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "contoh-format-soal-word.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      function parseWordRawTextToQuestions(rawText, paketId) {
+        const lines = rawText
+          .split(/\r?\n/)
+          .map((l) => l.trim())
+          .filter((l) => l.length > 0);
+
+        const parsedQuestions = [];
+        let current = null;
+
+        function finalizeCurrent() {
+          if (!current || !current.pertanyaan) return;
+          const hasPG = current.opsiA || current.opsiB || current.opsiC || current.opsiD;
+          if (hasPG) {
+            current.jenis = "PG";
+            current.kunci = (current.kunci || "A").toUpperCase();
+            if (!["A", "B", "C", "D"].includes(current.kunci)) current.kunci = "A";
+          } else if (current.kunci) {
+            current.jenis = "ISIAN";
+          } else {
+            current.jenis = "URAIAN";
+            current.kunci = "Manual";
+          }
+          parsedQuestions.push(current);
+        }
+
+        for (const line of lines) {
+          // Deteksi baris opsi A., B., C., D. (atau A), B), C), D))
+          const optMatch = line.match(/^([A-Da-d])[\.\)]\s*(.+)$/);
+          if (optMatch && current) {
+            const letter = optMatch[1].toUpperCase();
+            current["opsi" + letter] = optMatch[2].trim();
+            continue;
+          }
+
+          // Deteksi baris KUNCI: ... atau JAWABAN: ...
+          const keyMatch = line.match(/^(?:KUNCI|JAWABAN|KUNCI\s*JAWABAN)\s*[:=\-]\s*(.+)$/i);
+          if (keyMatch && current) {
+            current.kunci = keyMatch[1].trim();
+            continue;
+          }
+
+          // Deteksi nomor soal baru (misal "1. ..." atau "1) ..." atau "SOAL: ...")
+          const numMatch = line.match(/^(?:SOAL\s*[:\-]\s*|\d+[\.\)]\s*)(.+)$/i);
+          if (numMatch) {
+            finalizeCurrent();
+            current = {
+              id: "soal-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+              paketId,
+              jenis: "PG",
+              bobot: 10,
+              pertanyaan: numMatch[1].trim(),
+              opsiA: "",
+              opsiB: "",
+              opsiC: "",
+              opsiD: "",
+              kunci: ""
+            };
+            continue;
+          }
+
+          // Jika baris lanjutan pertanyaan atau awal soal tanpa nomor
+          if (!current) {
+            current = {
+              id: "soal-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+              paketId,
+              jenis: "PG",
+              bobot: 10,
+              pertanyaan: line,
+              opsiA: "",
+              opsiB: "",
+              opsiC: "",
+              opsiD: "",
+              kunci: ""
+            };
+          } else if (!current.opsiA && !current.kunci) {
+            current.pertanyaan += " " + line;
+          } else {
+            finalizeCurrent();
+            current = {
+              id: "soal-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+              paketId,
+              jenis: "PG",
+              bobot: 10,
+              pertanyaan: line,
+              opsiA: "",
+              opsiB: "",
+              opsiC: "",
+              opsiD: "",
+              kunci: ""
+            };
+          }
+        }
+        finalizeCurrent();
+        return parsedQuestions;
+      }
+
+      document.getElementById("btnImportWord").addEventListener("click", async () => {
+        const paketId = document.getElementById("selectPaketForSoal").value;
+        if (!paketId) {
+          toast("Pilih atau buat paket ujian terlebih dahulu.");
+          return;
+        }
+        const fileInput = document.getElementById("inputWordFile");
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) {
+          toast("Pilih file dokumen Word (.docx) dari laptop terlebih dahulu.");
+          return;
+        }
+        if (typeof mammoth === "undefined") {
+          toast("Pustaka pembaca Word sedang dimuat, periksa koneksi internet lalu coba lagi.");
+          return;
+        }
+
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          const imported = parseWordRawTextToQuestions(result.value || "", paketId);
+
+          if (imported.length === 0) {
+            toast("Tidak ada soal yang terbaca dari file Word. Periksa format penulisan soal.");
+            return;
+          }
+
+          appData.soalList.push(...imported);
+          saveLocal();
+          await pushBankSoalToSheets();
+          fileInput.value = "";
+          renderPaketTable();
+          renderSoalTable();
+          toast(`Berhasil mengimpor ${imported.length} soal dari dokumen Word!`);
+        } catch (err) {
+          toast("Gagal membaca file Word (.docx). Pastikan file berformat .docx yang valid.");
+        }
+      });
+
+      // ==================== TAMBAH / EDIT SOAL MANUAL ====================
       function populateSelectPaketSoal() {
         const sel = document.getElementById("selectPaketForSoal");
         const prev = sel.value;
