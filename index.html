@@ -90,7 +90,14 @@
 
     .inline-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
-    /* Student Exam Screen */
+    /* Anti-Copy & Fullscreen Exam Mode */
+    .no-copy-zone {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
     .exam-header {
       background: #1e293b;
       color: #fff;
@@ -110,6 +117,29 @@
       border-radius: 6px;
       font-weight: 700;
       font-size: 15px;
+    }
+    .fullscreen-banner {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+    .question-img-preview {
+      max-width: 100%;
+      max-height: 280px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      margin: 8px 0 12px;
+      display: block;
+      pointer-events: none;
     }
     .option-item {
       display: flex;
@@ -157,6 +187,13 @@
     th, td { padding: 9px 11px; border-bottom: 1px solid #e2e8f0; text-align: left; }
     th { background: #f8fafc; font-weight: 700; color: #334155; }
 
+    .group-header-row td {
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-weight: 700;
+      border-top: 2px solid #93c5fd;
+    }
+
     .alert-info {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
@@ -176,6 +213,25 @@
       margin-bottom: 12px;
     }
 
+    .quick-key-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .quick-key-btn {
+      padding: 8px 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #f8fafc;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .quick-key-btn.active {
+      background: #16a34a;
+      color: #fff;
+      border-color: #16a34a;
+    }
+
     /* Modals */
     .modal-backdrop {
       position: fixed;
@@ -191,7 +247,7 @@
     .modal-card {
       background: #fff;
       border-radius: 8px;
-      max-width: 460px;
+      max-width: 500px;
       width: 100%;
       padding: 20px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
@@ -222,7 +278,7 @@
   </style>
 </head>
 <body>
-  <header class="topbar">
+  <header class="topbar" id="mainTopbar">
     <div>
       <h1>CBT UJIAN SEMESTER — UPTD SPF SMP N 1 KUTA BAHARU</h1>
       <p>Portal Ujian Siswa &amp; Panel Pengelola Guru/Admin</p>
@@ -230,7 +286,7 @@
     <div class="topbar-right">
       <span id="syncStatusBadge" class="badge-status">Mode Lokal (Belum Terhubung Sheets)</span>
       <button type="button" id="btnSwitchStudent" class="btn btn-secondary btn-sm">Halaman Siswa</button>
-      <button type="button" id="btnSwitchAdmin" class="btn btn-primary btn-sm">Panel Admin / Guru</button>
+      <button type="button" id="btnSwitchAdmin" class="btn btn-primary btn-sm" style="position: relative; z-index: 50;">Panel Admin / Guru</button>
     </div>
   </header>
 
@@ -295,23 +351,29 @@
           </div>
 
           <div class="alert-info">
-            <strong>Ketentuan Ujian:</strong><br />
-            1. Jangan berpindah tab atau keluar dari halaman ujian (batas toleransi 3 kali peringatan; ke-3 otomatis dikumpulkan).<br />
-            2. Setelah selesai, jawaban otomatis dikirim ke server Google Sheets / Panel Admin.
+            <strong>Ketentuan Ujian (Mode Layar Penuh &amp; Anti-Copy):</strong><br />
+            1. Ujian otomatis berjalan dalam <strong>mode Fullscreen (Layar Penuh)</strong>.<br />
+            2. Teks soal dilindungi agar tidak dapat disalin (<em>copy</em>), klik kanan, atau berpindah tab (batas toleransi 3 kali pelanggaran; ke-3 otomatis dikumpulkan).<br />
+            3. Setelah selesai, hasil Pilihan Ganda (Benar/Salah) dan status pemeriksaan Isian/Esai langsung ditampilkan.
           </div>
 
-          <button type="submit" class="btn btn-success">Mulai Ujian Sekarang</button>
+          <button type="submit" class="btn btn-success">Mulai Ujian Sekarang (Layar Penuh)</button>
         </form>
       </div>
     </section>
 
-    <!-- ==================== VIEW 2: LEMBAR UJIAN SISWA ==================== -->
-    <section id="viewStudentExam" class="hidden">
+    <!-- ==================== VIEW 2: LEMBAR UJIAN SISWA (FULLSCREEN & ANTI-COPY) ==================== -->
+    <section id="viewStudentExam" class="hidden no-copy-zone">
+      <div id="fullscreenWarningBar" class="fullscreen-banner hidden">
+        <span><strong>Peringatan Layar Penuh:</strong> Anda keluar dari mode Fullscreen! Klik tombol di samping untuk kembali ke layar penuh.</span>
+        <button type="button" id="btnReenterFullscreen" class="btn btn-danger btn-sm">Masuk Fullscreen Lagi</button>
+      </div>
+
       <div class="exam-header">
         <div>
           <strong id="examMapelTitle">Mata Pelajaran</strong>
           <div style="font-size: 12px; color: #cbd5e1;">
-            Peserta: <span id="examStudentInfo">-</span> | Pelanggaran Tab: <strong id="examViolationInfo">0 / 3</strong>
+            Peserta: <span id="examStudentInfo">-</span> | Pelanggaran: <strong id="examViolationInfo">0 / 3</strong>
           </div>
         </div>
         <div class="inline-group">
@@ -326,7 +388,8 @@
           <span id="questionTypeBadge" class="badge-status">Pilihan Ganda</span>
         </div>
 
-        <p id="questionTextDisplay" style="font-size: 15px; line-height: 1.6; margin: 10px 0 14px;"></p>
+        <img id="questionImageDisplay" class="question-img-preview hidden" alt="Gambar Soal" />
+        <p id="questionTextDisplay" style="font-size: 15px; line-height: 1.6; margin: 10px 0 14px; white-space: pre-line;"></p>
         <div id="answerArea"></div>
 
         <div style="display: flex; justify-content: space-between; margin-top: 18px;">
@@ -345,17 +408,28 @@
     <section id="viewStudentDone" class="hidden">
       <div class="card">
         <h2 style="color: #15803d;">&#10004; Ujian Telah Selesai Dikerjakan</h2>
-        <p class="card-desc">Jawaban Anda telah tercatat. Berikut ringkasan poin dan hasil akhir ujian Anda.</p>
+        <p class="card-desc">Jawaban Anda telah tercatat. Berikut ringkasan hasil pengerjaan ujian Anda.</p>
 
-        <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 16px; margin-bottom: 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
-          <div>
-            <div style="font-size: 12px; font-weight: 600; color: #166534;">POIN DIPEROLEH</div>
-            <div style="font-size: 26px; font-weight: 800; color: #15803d;" id="donePoinDisplay">0 / 0 Poin</div>
+        <!-- Ringkasan Hasil Pilihan Ganda -->
+        <div id="donePgSummaryBox" style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 16px; margin-bottom: 14px; display: flex; flex-wrap: wrap; justify-content: space-around; align-items: center; gap: 14px;">
+          <div style="text-align: center;">
+            <div style="font-size: 12px; font-weight: 700; color: #166534;">PILIHAN GANDA — BENAR</div>
+            <div style="font-size: 28px; font-weight: 800; color: #15803d;" id="donePgBenar">0</div>
           </div>
-          <div style="text-align: right;">
-            <div style="font-size: 12px; font-weight: 600; color: #1e40af;">NILAI AKHIR</div>
-            <div style="font-size: 26px; font-weight: 800; color: #1d4ed8;" id="doneNilaiDisplay">0</div>
+          <div style="text-align: center;">
+            <div style="font-size: 12px; font-weight: 700; color: #991b1b;">PILIHAN GANDA — SALAH</div>
+            <div style="font-size: 28px; font-weight: 800; color: #dc2626;" id="donePgSalah">0</div>
           </div>
+          <div style="text-align: center;">
+            <div style="font-size: 12px; font-weight: 700; color: #1e40af;">TOTAL SOAL PG</div>
+            <div style="font-size: 28px; font-weight: 800; color: #1d4ed8;" id="donePgTotal">0</div>
+          </div>
+        </div>
+
+        <!-- Status Pemeriksaan Soal Esai / Isian Singkat -->
+        <div id="doneEssayStatusBox" class="alert-warn hidden" style="font-size: 14px;">
+          <strong>Soal Esai / Isian Singkat (<span id="doneEssayCount">0</span> soal):</strong>
+          Status: <strong style="color: #b45309;">Sedang Diperiksa oleh Guru</strong>
         </div>
 
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; font-size: 13px; line-height: 1.8; margin-bottom: 14px;">
@@ -363,8 +437,8 @@
           <div><strong>NISN:</strong> <span id="doneNisn">-</span></div>
           <div><strong>Kelas / Hari:</strong> <span id="doneKelasHari">-</span></div>
           <div><strong>Mata Pelajaran:</strong> <span id="doneMapel">-</span></div>
-          <div><strong>Perolehan Poin:</strong> <span id="donePoinRinci">-</span></div>
-          <div><strong>Nilai Akhir:</strong> <span id="doneNilaiRinci">-</span></div>
+          <div><strong>Hasil Pilihan Ganda:</strong> <span id="donePgRinci">-</span></div>
+          <div><strong>Status Soal Esai / Isian Singkat:</strong> <span id="doneEssayRinci">-</span></div>
           <div><strong>Status Pengiriman Pusat:</strong> <span id="doneSendStatus">-</span></div>
           <div><strong>Waktu Selesai:</strong> <span id="doneWaktu">-</span></div>
         </div>
@@ -394,16 +468,17 @@
       <div class="admin-tabs">
         <button type="button" class="tab-btn active" data-admin-tab="admPaket">1. Paket Ujian &amp; Token</button>
         <button type="button" class="tab-btn" data-admin-tab="admSoal">2. Tambah, Edit &amp; Impor Word</button>
-        <button type="button" class="tab-btn" data-admin-tab="admRekap">3. Rekap Nilai Siswa</button>
+        <button type="button" class="tab-btn" data-admin-tab="admRekap">3. Rekap Nilai per Kelas &amp; Mapel</button>
         <button type="button" class="tab-btn" data-admin-tab="admLink">4. Link Akses HP Siswa</button>
         <button type="button" class="tab-btn" data-admin-tab="admPengaturan">5. Pengaturan &amp; Sandi</button>
       </div>
 
-      <!-- TAB 1: PAKET UJIAN -->
+      <!-- TAB 1: PAKET UJIAN (TAMBAH & EDIT PAKET) -->
       <div id="admPaket" class="admin-panel active">
         <div class="card">
-          <h2>Tambah Paket Ujian per Kelas &amp; Hari</h2>
+          <h2 id="formPaketHeading">Tambah Paket Ujian per Kelas &amp; Hari</h2>
           <form id="formAddPaket">
+            <input type="hidden" id="editingPaketId" value="" />
             <div class="form-row">
               <div class="form-group">
                 <label for="admKelas">Kelas *</label>
@@ -442,7 +517,10 @@
                 </div>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary">+ Simpan Paket Ujian</button>
+            <div class="inline-group">
+              <button type="submit" id="btnSubmitPaket" class="btn btn-primary">+ Simpan Paket Ujian</button>
+              <button type="button" id="btnCancelEditPaket" class="btn btn-secondary hidden">Batal Edit Paket</button>
+            </div>
           </form>
         </div>
 
@@ -467,7 +545,7 @@
         </div>
       </div>
 
-      <!-- TAB 2: TAMBAH, EDIT & IMPOR WORD -->
+      <!-- TAB 2: PENGISIAN SOAL MUDAH, GAMBAR SOAL & IMPOR WORD -->
       <div id="admSoal" class="admin-panel">
         <div class="card">
           <h2>Pilih Paket Ujian &amp; Impor Soal dari Microsoft Word (.docx)</h2>
@@ -478,10 +556,10 @@
 
           <div class="alert-info">
             <strong>Impor Soal Sekaligus dari File Word (.docx):</strong><br />
-            Susun soal di Microsoft Word dengan format per soal (pisahkan antarsoal dengan baris kosong):<br />
+            Susun soal di Microsoft Word dengan format per soal:<br />
             <code>1. Ibu kota negara Indonesia adalah...</code><br />
             <code>A. Bandung</code> | <code>B. Surabaya</code> | <code>C. Jakarta</code> | <code>D. Medan</code><br />
-            <code>KUNCI: C</code> (untuk Isian/Uraian tanpa opsi A-D, cukup tulis pertanyaan lalu <code>KUNCI: jawaban</code> atau tanpa <code>KUNCI:</code> untuk uraian).
+            <code>KUNCI: C</code> (untuk Isian Singkat tulis <code>KUNCI: jawaban</code>, untuk Esai/Uraian cukup tulis pertanyaan saja).
           </div>
 
           <div class="form-row" style="align-items: flex-end;">
@@ -497,70 +575,86 @@
         </div>
 
         <div class="card">
-          <h2>Tambah / Edit Butir Soal Manual</h2>
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <h2 id="formSoalHeading" style="margin: 0;">Pengisian Butir Soal Cepat &amp; Mudah</h2>
+            <span class="badge-status" id="soalNumberIndicator">Menambahkan Soal Ke-1</span>
+          </div>
+          <p class="card-desc">Gunakan tombol <strong>Simpan &amp; Lanjut Soal Berikutnya</strong> untuk mengisi soal berurutan tanpa harus memilih jenis/paket berulang kali.</p>
+
           <form id="formSaveSoal">
             <input type="hidden" id="editingSoalId" value="" />
+            <input type="hidden" id="soalImageData" value="" />
+
             <div class="form-row">
               <div class="form-group" style="max-width: 260px;">
                 <label for="soalJenis">Jenis Soal *</label>
                 <select id="soalJenis">
-                  <option value="PG">Pilihan Ganda</option>
-                  <option value="ISIAN">Isian Singkat</option>
-                  <option value="URAIAN">Uraian / Esai</option>
+                  <option value="PG">Pilihan Ganda (Dinilai Otomatis: Benar/Salah)</option>
+                  <option value="ISIAN">Isian Singkat (Status: Sedang Diperiksa)</option>
+                  <option value="URAIAN">Esai / Uraian (Status: Sedang Diperiksa)</option>
                 </select>
               </div>
-              <div class="form-group" style="max-width: 160px;">
-                <label for="soalBobot">Bobot Poin *</label>
-                <input type="number" id="soalBobot" min="1" max="100" value="10" required />
+              <div class="form-group">
+                <label for="soalImageFile">Sisipkan Gambar / Foto Soal (Opsional — JPG/PNG)</label>
+                <div class="inline-group">
+                  <input type="file" id="soalImageFile" accept="image/*" style="flex: 1;" />
+                  <button type="button" id="btnRemoveSoalImage" class="btn btn-danger btn-sm hidden">Hapus Gambar</button>
+                </div>
               </div>
+            </div>
+
+            <div id="adminSoalImgPreviewBox" class="hidden" style="margin-bottom: 12px;">
+              <div style="font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 4px;">Pratinjau Gambar Soal:</div>
+              <img id="adminSoalImgPreview" src="" alt="Pratinjau" style="max-height: 180px; border-radius: 6px; border: 1px solid #cbd5e1;" />
             </div>
 
             <div class="form-group" style="margin-bottom: 12px;">
               <label for="soalTeks">Pertanyaan / Teks Soal *</label>
-              <textarea id="soalTeks" placeholder="Tulis pertanyaan di sini..." required></textarea>
+              <textarea id="soalTeks" placeholder="Ketik atau tempel pertanyaan di sini..." required></textarea>
             </div>
 
             <div id="boxOpsiPG">
               <div class="form-row">
                 <div class="form-group">
-                  <label for="soalOptA">Opsi A *</label>
-                  <input type="text" id="soalOptA" placeholder="Pilihan A" />
+                  <label for="soalOptA">Pilihan A *</label>
+                  <input type="text" id="soalOptA" placeholder="Isi jawaban A" />
                 </div>
                 <div class="form-group">
-                  <label for="soalOptB">Opsi B *</label>
-                  <input type="text" id="soalOptB" placeholder="Pilihan B" />
+                  <label for="soalOptB">Pilihan B *</label>
+                  <input type="text" id="soalOptB" placeholder="Isi jawaban B" />
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="soalOptC">Opsi C *</label>
-                  <input type="text" id="soalOptC" placeholder="Pilihan C" />
+                  <label for="soalOptC">Pilihan C *</label>
+                  <input type="text" id="soalOptC" placeholder="Isi jawaban C" />
                 </div>
                 <div class="form-group">
-                  <label for="soalOptD">Opsi D *</label>
-                  <input type="text" id="soalOptD" placeholder="Pilihan D" />
+                  <label for="soalOptD">Pilihan D *</label>
+                  <input type="text" id="soalOptD" placeholder="Isi jawaban D" />
                 </div>
               </div>
-              <div class="form-group" style="max-width: 220px; margin-bottom: 12px;">
-                <label for="soalKunciPG">Kunci Jawaban Benar *</label>
-                <select id="soalKunciPG">
-                  <option value="A">A</option>
-                  <option value="B">B</option>
-                  <option value="C">C</option>
-                  <option value="D">D</option>
-                </select>
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label>Klik Kunci Jawaban Benar *</label>
+                <div class="quick-key-group" id="quickKeyButtons">
+                  <button type="button" class="quick-key-btn active" data-key="A">Kunci: A</button>
+                  <button type="button" class="quick-key-btn" data-key="B">Kunci: B</button>
+                  <button type="button" class="quick-key-btn" data-key="C">Kunci: C</button>
+                  <button type="button" class="quick-key-btn" data-key="D">Kunci: D</button>
+                </div>
+                <input type="hidden" id="soalKunciPG" value="A" />
               </div>
             </div>
 
             <div id="boxOpsiIsian" class="hidden" style="margin-bottom: 12px;">
-              <div class="form-group" style="max-width: 420px;">
-                <label for="soalKunciIsian">Kunci Jawaban Acuan (Tidak peka huruf besar/kecil)</label>
-                <input type="text" id="soalKunciIsian" placeholder="Contoh: Jakarta" />
+              <div class="form-group" style="max-width: 460px;">
+                <label for="soalKunciIsian">Catatan / Kunci Acuan Guru (Opsional — untuk referensi koreksi guru)</label>
+                <input type="text" id="soalKunciIsian" placeholder="Contoh: Jakarta (Status di siswa tetap: Sedang Diperiksa)" />
               </div>
             </div>
 
             <div class="inline-group">
-              <button type="submit" id="btnSubmitSoal" class="btn btn-primary">Simpan Soal Baru</button>
+              <button type="submit" id="btnSubmitSoal" class="btn btn-success">Simpan &amp; Lanjut Soal Berikutnya</button>
               <button type="button" id="btnCancelEditSoal" class="btn btn-secondary hidden">Batal Edit</button>
             </div>
           </form>
@@ -574,9 +668,9 @@
                 <tr>
                   <th>No</th>
                   <th>Jenis</th>
+                  <th>Gambar</th>
                   <th>Pertanyaan</th>
-                  <th>Kunci</th>
-                  <th>Bobot</th>
+                  <th>Kunci / Acuan</th>
                   <th>Aksi</th>
                 </tr>
               </thead>
@@ -586,17 +680,17 @@
         </div>
       </div>
 
-      <!-- TAB 3: REKAP NILAI SISWA -->
+      <!-- TAB 3: REKAP NILAI SISWA (PER KELAS & PER MATA PELAJARAN) -->
       <div id="admRekap" class="admin-panel">
         <div class="card">
           <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px;">
             <div>
-              <h2>Rekap Hasil &amp; Nilai Ujian Siswa</h2>
-              <p class="card-desc" style="margin-bottom: 0;">Klik <strong>Muat Ulang dari Google Sheets</strong> untuk menarik hasil terbaru yang dikerjakan siswa di HP masing-masing.</p>
+              <h2>Rekap Hasil Ujian Siswa (Dikelompokkan per Kelas &amp; Mata Pelajaran)</h2>
+              <p class="card-desc" style="margin-bottom: 0;">Data otomatis dikelompokkan per <strong>Kelas</strong> dan <strong>Mata Pelajaran</strong> serta dikirim terpisah ke tab sheet per Kelas &amp; Mapel di Google Sheets.</p>
             </div>
             <div class="inline-group">
               <button type="button" id="btnPullRekap" class="btn btn-primary btn-sm">Muat Ulang dari Google Sheets</button>
-              <button type="button" id="btnExportCsv" class="btn btn-secondary btn-sm">Unduh Excel (.csv)</button>
+              <button type="button" id="btnExportCsv" class="btn btn-secondary btn-sm">Unduh Excel per Filter (.csv)</button>
             </div>
           </div>
 
@@ -612,7 +706,9 @@
             </div>
             <div class="form-group">
               <label for="filterRekapMapel">Filter Mata Pelajaran</label>
-              <input type="text" id="filterRekapMapel" placeholder="Cari mapel..." />
+              <select id="filterRekapMapel">
+                <option value="SEMUA">Semua Mata Pelajaran</option>
+              </select>
             </div>
             <div class="form-group">
               <label for="filterRekapNama">Cari Nama / NISN</label>
@@ -624,13 +720,14 @@
             <table>
               <thead>
                 <tr>
+                  <th>No</th>
                   <th>Waktu</th>
                   <th>Nama Siswa</th>
                   <th>NISN</th>
                   <th>Kelas</th>
-                  <th>Hari</th>
-                  <th>Mapel</th>
-                  <th>Nilai</th>
+                  <th>Mata Pelajaran</th>
+                  <th>PG (Benar / Salah)</th>
+                  <th>Status Esai/Isian</th>
                   <th>Pelanggaran</th>
                   <th>Detail Jawaban</th>
                 </tr>
@@ -646,7 +743,7 @@
         <div class="card">
           <h2>Link Khusus untuk Dibagikan ke HP Siswa</h2>
           <p class="card-desc">
-            Gunakan tombol <strong>Salin Link Ujian Siswa</strong> di bawah ini lalu kirimkan ke grup WhatsApp kelas. Link ini sudah otomatis menyertakan alamat Google Apps Script sehingga HP siswa langsung tahu ke mana jawaban harus dikirim!
+            Gunakan tombol <strong>Salin Link Ujian Siswa</strong> di bawah ini lalu kirimkan ke grup WhatsApp kelas. Link ini sudah otomatis menyertakan alamat Google Apps Script sehingga HP siswa langsung terhubung ke Google Sheets sekolah!
           </p>
 
           <div class="form-group" style="margin-bottom: 12px;">
@@ -656,17 +753,13 @@
               <button type="button" id="btnCopyStudentLink" class="btn btn-primary">Salin Link Ujian Siswa</button>
             </div>
           </div>
-
-          <div class="alert-info">
-            <strong>Mengapa link ini penting?</strong> Karena file di GitHub Pages bersifat statis, menyertakan parameter <code>?gas=...</code> di akhir link membuat HP siswa otomatis terhubung ke Google Sheets sekolah tanpa perlu siswa mengatur apa pun.
-          </div>
         </div>
       </div>
 
       <!-- TAB 5: PENGATURAN GOOGLE SHEETS & PASSWORD -->
       <div id="admPengaturan" class="admin-panel">
         <div class="card">
-          <h2>Koneksi Google Sheets (Agar Jawaban Siswa &amp; Soal Tersimpan Terpusat)</h2>
+          <h2>Koneksi Google Sheets (Rekap per Kelas &amp; Mata Pelajaran)</h2>
           <form id="formSaveSettings">
             <div class="form-group" style="margin-bottom: 12px;">
               <label for="inputGasUrl">URL Google Apps Script Web App (Berakhiran /exec) *</label>
@@ -674,7 +767,7 @@
             </div>
 
             <div class="form-group" style="max-width: 240px; margin-bottom: 12px;">
-              <label for="inputMaxTab">Batas Pelanggaran Pindah Tab</label>
+              <label for="inputMaxTab">Batas Pelanggaran Pindah Tab / Keluar Fullscreen</label>
               <input type="number" id="inputMaxTab" min="1" max="10" value="3" />
             </div>
 
@@ -744,7 +837,7 @@
 
   <script>
     (function () {
-      const STORAGE_KEY = "cbt_smpn1_kutabaharu_v3";
+      const STORAGE_KEY = "cbt_smpn1_kutabaharu_v4";
       const SESSION_KEY = "cbt_smpn1_admin_logged_in";
       const DEFAULT_ADMIN_PASS = "admin123";
 
@@ -767,7 +860,7 @@
             id: "soal-1",
             paketId: "pkt-1",
             jenis: "PG",
-            bobot: 10,
+            imageData: "",
             pertanyaan: "Hasil dari 15 + (-7) adalah...",
             opsiA: "8",
             opsiB: "-8",
@@ -796,7 +889,7 @@
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
         } catch (e) {
-          toast("Gagal menyimpan ke penyimpanan browser.");
+          toast("Penyimpanan penuh. Perkecil ukuran gambar soal jika terlalu besar.");
         }
       }
 
@@ -814,10 +907,9 @@
               rekapList: Array.isArray(parsed.rekapList) ? parsed.rekapList : []
             };
           } else {
-            // Migrasi URL Google Sheets jika sebelumnya tersimpan di v2
-            const oldRaw = localStorage.getItem("cbt_smpn1_kutabaharu_v2");
-            if (oldRaw) {
-              const oldParsed = JSON.parse(oldRaw);
+            const prevRaw = localStorage.getItem("cbt_smpn1_kutabaharu_v3") || localStorage.getItem("cbt_smpn1_kutabaharu_v2");
+            if (prevRaw) {
+              const oldParsed = JSON.parse(prevRaw);
               if (oldParsed && oldParsed.gasUrl) appData.gasUrl = oldParsed.gasUrl;
               if (Array.isArray(oldParsed.paketList)) appData.paketList = oldParsed.paketList;
               if (Array.isArray(oldParsed.soalList)) appData.soalList = oldParsed.soalList;
@@ -866,9 +958,85 @@
           document.getElementById(id).classList.add("hidden");
         });
         document.getElementById(viewId).classList.remove("hidden");
+        document.getElementById("mainTopbar").classList.toggle("hidden", viewId === "viewStudentExam");
       }
 
-      // ==================== SINKRONISASI GOOGLE SHEETS ====================
+      // ==================== FULLSCREEN & ANTI-COPY PROTECTION ====================
+      function requestExamFullscreen() {
+        const el = document.documentElement;
+        if (el.requestFullscreen) {
+          el.requestFullscreen().catch(() => {});
+        } else if (el.webkitRequestFullscreen) {
+          el.webkitRequestFullscreen();
+        } else if (el.msRequestFullscreen) {
+          el.msRequestFullscreen();
+        }
+      }
+
+      function exitExamFullscreen() {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+      }
+
+      function isFullscreenActive() {
+        return Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+      }
+
+      document.getElementById("btnReenterFullscreen").addEventListener("click", () => {
+        requestExamFullscreen();
+        document.getElementById("fullscreenWarningBar").classList.add("hidden");
+      });
+
+      function registerExamViolation(reasonText) {
+        if (!activeExam) return;
+        activeExam.violations += 1;
+        document.getElementById("examViolationInfo").textContent = `${activeExam.violations} / ${appData.maxTab}`;
+        if (activeExam.violations >= appData.maxTab) {
+          finishExam(`Terkunci (${appData.maxTab}x Pelanggaran: ${reasonText})`);
+        } else {
+          toast(`Peringatan (${activeExam.violations}/${appData.maxTab}): ${reasonText}`);
+        }
+      }
+
+      document.addEventListener("fullscreenchange", () => {
+        if (!activeExam) return;
+        if (!isFullscreenActive()) {
+          document.getElementById("fullscreenWarningBar").classList.remove("hidden");
+          registerExamViolation("Keluar dari Mode Layar Penuh");
+        } else {
+          document.getElementById("fullscreenWarningBar").classList.add("hidden");
+        }
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && activeExam) {
+          registerExamViolation("Berpindah Tab / Aplikasi");
+        }
+      });
+
+      // Blokir copy, cut, klik kanan & pintasan Ctrl+C/U/S/P saat ujian berlangsung
+      ["copy", "cut", "contextmenu", "selectstart", "dragstart"].forEach((evtName) => {
+        document.addEventListener(evtName, (e) => {
+          if (activeExam && !["INPUT", "TEXTAREA"].includes(e.target.tagName)) {
+            e.preventDefault();
+          }
+        });
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (!activeExam) return;
+        const key = (e.key || "").toLowerCase();
+        if ((e.ctrlKey || e.metaKey) && ["c", "x", "u", "s", "p", "a"].includes(key)) {
+          if (!["INPUT", "TEXTAREA"].includes(e.target.tagName)) {
+            e.preventDefault();
+            toast("Menyalin teks soal dinonaktifkan selama ujian berlangsung.");
+          }
+        }
+      });
+
+      // ==================== SINKRONISASI GOOGLE SHEETS (PER KELAS & PER MAPEL) ====================
       async function pushBankSoalToSheets() {
         if (!appData.gasUrl) return;
         try {
@@ -882,9 +1050,7 @@
               soalList: appData.soalList
             })
           });
-        } catch (e) {
-          // Tetap tersimpan di localStorage
-        }
+        } catch (e) {}
       }
 
       async function pullAllFromSheets(silent = false) {
@@ -918,11 +1084,21 @@
       async function sendExamResultToSheets(payload) {
         if (!appData.gasUrl) return false;
         try {
+          const sheetTabName = `${payload.kelas} - ${payload.mapel}`.replace(/[\\/\?\*\[\]:]/g, "_").slice(0, 95);
           await fetch(appData.gasUrl, {
             method: "POST",
             mode: "no-cors",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(Object.assign({ action: "submitExam" }, payload))
+            body: JSON.stringify(
+              Object.assign(
+                {
+                  action: "submitExam",
+                  groupByKelasMapel: true,
+                  sheetTabName
+                },
+                payload
+              )
+            )
           });
           return true;
         } catch (e) {
@@ -930,20 +1106,14 @@
         }
       }
 
-      // ==================== NAVIGASI UTAMA, LOGIN & RESET SANDI ADMIN ====================
+      // ==================== NAVIGASI UTAMA & LOGIN ADMIN ====================
       document.getElementById("btnSwitchStudent").addEventListener("click", () => {
-        if (activeExam) {
-          toast("Selesaikan ujian terlebih dahulu.");
-          return;
-        }
+        if (activeExam) return;
         showView("viewStudentLogin");
       });
 
       document.getElementById("btnSwitchAdmin").addEventListener("click", () => {
-        if (activeExam) {
-          toast("Tidak bisa membuka panel admin saat ujian sedang berjalan.");
-          return;
-        }
+        if (activeExam) return;
         if (isAdminLoggedIn()) {
           showView("viewAdminPanel");
           renderAllAdmin();
@@ -984,7 +1154,6 @@
         if (confirm("Reset sandi Panel Admin di browser ini kembali ke sandi awal?")) {
           resetAdminPasswordToDefault();
           document.getElementById("adminPassInput").value = "";
-          document.getElementById("adminPassInput").focus();
         }
       });
 
@@ -1001,7 +1170,6 @@
         toast("Keluar dari Panel Admin.");
       });
 
-      // Admin Sub-tabs
       document.querySelectorAll(".tab-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
           document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
@@ -1085,8 +1253,10 @@
         document.getElementById("examMapelTitle").textContent = `${paket.mapel} — ${paket.kelas} (${paket.hari})`;
         document.getElementById("examStudentInfo").textContent = `${nama} (${nisn})`;
         document.getElementById("examViolationInfo").textContent = `0 / ${appData.maxTab}`;
+        document.getElementById("fullscreenWarningBar").classList.add("hidden");
 
         showView("viewStudentExam");
+        requestExamFullscreen();
         renderCurrentQuestion();
         startExamTimer();
       });
@@ -1117,7 +1287,17 @@
 
         document.getElementById("questionCounterLabel").textContent = `Soal No. ${idx + 1} dari ${total}`;
         document.getElementById("questionTypeBadge").textContent =
-          q.jenis === "PG" ? "Pilihan Ganda" : q.jenis === "ISIAN" ? "Isian Singkat" : "Uraian / Esai";
+          q.jenis === "PG" ? "Pilihan Ganda" : q.jenis === "ISIAN" ? "Isian Singkat" : "Esai / Uraian";
+
+        const imgEl = document.getElementById("questionImageDisplay");
+        if (q.imageData) {
+          imgEl.src = q.imageData;
+          imgEl.classList.remove("hidden");
+        } else {
+          imgEl.src = "";
+          imgEl.classList.add("hidden");
+        }
+
         document.getElementById("questionTextDisplay").textContent = q.pertanyaan;
 
         const area = document.getElementById("answerArea");
@@ -1148,7 +1328,7 @@
           area.appendChild(inp);
         } else {
           const ta = document.createElement("textarea");
-          ta.placeholder = "Tulis jawaban uraian Anda di sini...";
+          ta.placeholder = "Tulis jawaban esai / uraian Anda di sini...";
           ta.value = savedAns;
           ta.addEventListener("input", () => {
             activeExam.answers[q.id] = ta.value;
@@ -1194,18 +1374,6 @@
         }
       });
 
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden && activeExam) {
-          activeExam.violations += 1;
-          document.getElementById("examViolationInfo").textContent = `${activeExam.violations} / ${appData.maxTab}`;
-          if (activeExam.violations >= appData.maxTab) {
-            finishExam("Terkunci (3x Pindah Tab)");
-          } else {
-            toast(`Peringatan! Jangan keluar dari halaman ujian (${activeExam.violations}/${appData.maxTab}).`);
-          }
-        }
-      });
-
       document.getElementById("btnFinishExam").addEventListener("click", () => {
         if (confirm("Kumpulkan jawaban ujian sekarang?")) {
           finishExam("Selesai Normal");
@@ -1216,23 +1384,29 @@
         if (!activeExam) return;
         clearInterval(timerInterval);
 
-        let totalBobot = 0;
-        let skorDiperoleh = 0;
+        let pgTotal = 0;
+        let pgBenar = 0;
+        let pgSalah = 0;
+        let essayTotal = 0;
         const rincian = [];
 
         activeExam.questions.forEach((q, i) => {
-          const bobot = Number(q.bobot) || 10;
-          totalBobot += bobot;
           const ans = (activeExam.answers[q.id] || "").trim();
           if (q.jenis === "PG") {
-            if (ans.toUpperCase() === (q.kunci || "").toUpperCase()) skorDiperoleh += bobot;
-          } else if (q.jenis === "ISIAN" && q.kunci) {
-            if (ans.toLowerCase() === q.kunci.trim().toLowerCase()) skorDiperoleh += bobot;
+            pgTotal += 1;
+            const isCorrect = ans.toUpperCase() === (q.kunci || "").toUpperCase();
+            if (isCorrect) pgBenar += 1;
+            else pgSalah += 1;
+            rincian.push(`No.${i + 1} [PG]: ${ans || "(Kosong)"} (${isCorrect ? "Benar" : "Salah"})`);
+          } else {
+            essayTotal += 1;
+            const jenisLabel = q.jenis === "ISIAN" ? "Isian Singkat" : "Esai";
+            rincian.push(`No.${i + 1} [${jenisLabel}]: ${ans || "(Kosong)"} [Sedang Diperiksa]`);
           }
-          rincian.push(`No.${i + 1}: ${ans || "(Kosong)"}`);
         });
 
-        const nilaiAkhir = totalBobot > 0 ? Math.round((skorDiperoleh / totalBobot) * 100) : 0;
+        const pgRingkas = pgTotal > 0 ? `Benar: ${pgBenar}, Salah: ${pgSalah} (dari ${pgTotal} soal)` : "Tidak ada soal PG";
+        const essayStatusText = essayTotal > 0 ? `Sedang Diperiksa (${essayTotal} soal)` : "Tidak ada soal Esai/Isian";
         const waktuSelesai = new Date().toLocaleString("id-ID");
 
         const payload = {
@@ -1243,7 +1417,12 @@
           kelas: activeExam.paket.kelas,
           hari: activeExam.paket.hari,
           mapel: activeExam.paket.mapel,
-          nilai: `${nilaiAkhir} (${skorDiperoleh}/${totalBobot})`,
+          pgBenar,
+          pgSalah,
+          pgTotal,
+          essayTotal,
+          nilai: pgRingkas,
+          statusEsai: essayStatusText,
           pelanggaran: `${activeExam.violations}x (${statusLabel})`,
           detail: rincian.join(" | ")
         };
@@ -1254,23 +1433,33 @@
 
         const sent = await sendExamResultToSheets(payload);
 
-        const poinLabel = `${skorDiperoleh} / ${totalBobot} Poin`;
-        const nilaiLabel = `${nilaiAkhir} / 100`;
+        // Tampilkan hasil di halaman selesai siswa
+        document.getElementById("donePgSummaryBox").classList.toggle("hidden", pgTotal === 0);
+        document.getElementById("donePgBenar").textContent = String(pgBenar);
+        document.getElementById("donePgSalah").textContent = String(pgSalah);
+        document.getElementById("donePgTotal").textContent = String(pgTotal);
 
-        document.getElementById("donePoinDisplay").textContent = poinLabel;
-        document.getElementById("doneNilaiDisplay").textContent = String(nilaiAkhir);
-        document.getElementById("donePoinRinci").textContent = poinLabel;
-        document.getElementById("doneNilaiRinci").textContent = nilaiLabel;
+        const essayBox = document.getElementById("doneEssayStatusBox");
+        if (essayTotal > 0) {
+          essayBox.classList.remove("hidden");
+          document.getElementById("doneEssayCount").textContent = String(essayTotal);
+        } else {
+          essayBox.classList.add("hidden");
+        }
+
         document.getElementById("doneNama").textContent = payload.nama;
         document.getElementById("doneNisn").textContent = payload.nisn;
         document.getElementById("doneKelasHari").textContent = `${payload.kelas} / ${payload.hari}`;
         document.getElementById("doneMapel").textContent = payload.mapel;
+        document.getElementById("donePgRinci").textContent = pgRingkas;
+        document.getElementById("doneEssayRinci").textContent = essayStatusText;
         document.getElementById("doneWaktu").textContent = payload.waktu;
         document.getElementById("doneSendStatus").textContent = appData.gasUrl
           ? (sent ? "Terkirim ke Google Sheets Pusat" : "Tersimpan Lokal (Klik Kirim Ulang jika jaringan lambat)")
           : "Tersimpan di Perangkat Ini (URL Google Sheets belum diatur Admin)";
 
         activeExam = null;
+        exitExamFullscreen();
         showView("viewStudentDone");
       }
 
@@ -1286,7 +1475,7 @@
         showView("viewStudentLogin");
       });
 
-      // ==================== PANEL ADMIN: PAKET & SOAL ====================
+      // ==================== PANEL ADMIN: TAMBAH & EDIT PAKET UJIAN ====================
       document.getElementById("btnRandomToken").addEventListener("click", () => {
         const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
         let res = "";
@@ -1294,30 +1483,49 @@
         document.getElementById("admToken").value = res;
       });
 
+      function resetFormPaket() {
+        document.getElementById("editingPaketId").value = "";
+        document.getElementById("formAddPaket").reset();
+        document.getElementById("admDurasi").value = "90";
+        document.getElementById("formPaketHeading").textContent = "Tambah Paket Ujian per Kelas & Hari";
+        document.getElementById("btnSubmitPaket").textContent = "+ Simpan Paket Ujian";
+        document.getElementById("btnCancelEditPaket").classList.add("hidden");
+      }
+
+      document.getElementById("btnCancelEditPaket").addEventListener("click", resetFormPaket);
+
       document.getElementById("formAddPaket").addEventListener("submit", async (e) => {
         e.preventDefault();
+        const editId = document.getElementById("editingPaketId").value;
         const kelas = document.getElementById("admKelas").value;
         const hari = document.getElementById("admHari").value;
         const mapel = document.getElementById("admMapel").value.trim();
         const durasi = Number(document.getElementById("admDurasi").value) || 90;
         const token = document.getElementById("admToken").value.trim().toUpperCase();
 
-        appData.paketList.push({
-          id: "pkt-" + Date.now(),
-          kelas,
-          hari,
-          mapel,
-          durasi,
-          token
-        });
+        if (editId) {
+          const idx = appData.paketList.findIndex((p) => p.id === editId);
+          if (idx !== -1) {
+            appData.paketList[idx] = { id: editId, kelas, hari, mapel, durasi, token };
+          }
+          toast("Perubahan paket ujian berhasil disimpan.");
+        } else {
+          appData.paketList.push({
+            id: "pkt-" + Date.now(),
+            kelas,
+            hari,
+            mapel,
+            durasi,
+            token
+          });
+          toast("Paket ujian baru berhasil disimpan.");
+        }
 
         saveLocal();
         await pushBankSoalToSheets();
-        document.getElementById("admMapel").value = "";
-        document.getElementById("admToken").value = "";
+        resetFormPaket();
         renderAllAdmin();
         updateStudentPaketDropdown();
-        toast("Paket ujian berhasil disimpan.");
       });
 
       function renderPaketTable() {
@@ -1337,13 +1545,45 @@
             <td>${p.durasi} mnt</td>
             <td><strong>${p.token}</strong></td>
             <td>${jmlSoal} soal</td>
-            <td><button type="button" class="btn btn-danger btn-sm" data-del-pkt="${p.id}">Hapus</button></td>
+            <td>
+              <button type="button" class="btn btn-secondary btn-sm" data-edit-pkt="${p.id}">Edit</button>
+              <button type="button" class="btn btn-primary btn-sm" data-manage-soal="${p.id}">Isi Soal</button>
+              <button type="button" class="btn btn-danger btn-sm" data-del-pkt="${p.id}">Hapus</button>
+            </td>
           `;
           tbody.appendChild(tr);
         });
 
+        tbody.querySelectorAll("[data-edit-pkt]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const p = appData.paketList.find((x) => x.id === btn.dataset.editPkt);
+            if (!p) return;
+            document.getElementById("editingPaketId").value = p.id;
+            document.getElementById("admKelas").value = p.kelas;
+            document.getElementById("admHari").value = p.hari;
+            document.getElementById("admMapel").value = p.mapel;
+            document.getElementById("admDurasi").value = p.durasi;
+            document.getElementById("admToken").value = p.token;
+            document.getElementById("formPaketHeading").textContent = "Edit Paket Ujian: " + p.mapel;
+            document.getElementById("btnSubmitPaket").textContent = "Simpan Perubahan Paket";
+            document.getElementById("btnCancelEditPaket").classList.remove("hidden");
+            document.getElementById("admMapel").focus();
+          });
+        });
+
+        tbody.querySelectorAll("[data-manage-soal]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const pktId = btn.dataset.manageSoal;
+            document.querySelector('[data-admin-tab="admSoal"]').click();
+            document.getElementById("selectPaketForSoal").value = pktId;
+            resetFormSoal();
+            renderSoalTable();
+          });
+        });
+
         tbody.querySelectorAll("[data-del-pkt]").forEach((btn) => {
           btn.addEventListener("click", async () => {
+            if (!confirm("Hapus paket ujian ini beserta seluruh soal di dalamnya?")) return;
             const id = btn.dataset.delPkt;
             appData.paketList = appData.paketList.filter((p) => p.id !== id);
             appData.soalList = appData.soalList.filter((s) => s.paketId !== id);
@@ -1389,7 +1629,9 @@
 
       function parseWordRawTextToQuestions(rawText, paketId) {
         const lines = rawText
-          .split(/\r?\n/)
+          .split(/
+?
+/)
           .map((l) => l.trim())
           .filter((l) => l.length > 0);
 
@@ -1407,13 +1649,12 @@
             current.jenis = "ISIAN";
           } else {
             current.jenis = "URAIAN";
-            current.kunci = "Manual";
+            current.kunci = "";
           }
           parsedQuestions.push(current);
         }
 
         for (const line of lines) {
-          // Deteksi baris opsi A., B., C., D. (atau A), B), C), D))
           const optMatch = line.match(/^([A-Da-d])[\.\)]\s*(.+)$/);
           if (optMatch && current) {
             const letter = optMatch[1].toUpperCase();
@@ -1421,14 +1662,12 @@
             continue;
           }
 
-          // Deteksi baris KUNCI: ... atau JAWABAN: ...
           const keyMatch = line.match(/^(?:KUNCI|JAWABAN|KUNCI\s*JAWABAN)\s*[:=\-]\s*(.+)$/i);
           if (keyMatch && current) {
             current.kunci = keyMatch[1].trim();
             continue;
           }
 
-          // Deteksi nomor soal baru (misal "1. ..." atau "1) ..." atau "SOAL: ...")
           const numMatch = line.match(/^(?:SOAL\s*[:\-]\s*|\d+[\.\)]\s*)(.+)$/i);
           if (numMatch) {
             finalizeCurrent();
@@ -1436,7 +1675,7 @@
               id: "soal-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
               paketId,
               jenis: "PG",
-              bobot: 10,
+              imageData: "",
               pertanyaan: numMatch[1].trim(),
               opsiA: "",
               opsiB: "",
@@ -1447,13 +1686,12 @@
             continue;
           }
 
-          // Jika baris lanjutan pertanyaan atau awal soal tanpa nomor
           if (!current) {
             current = {
               id: "soal-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
               paketId,
               jenis: "PG",
-              bobot: 10,
+              imageData: "",
               pertanyaan: line,
               opsiA: "",
               opsiB: "",
@@ -1469,7 +1707,7 @@
               id: "soal-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
               paketId,
               jenis: "PG",
-              bobot: 10,
+              imageData: "",
               pertanyaan: line,
               opsiA: "",
               opsiB: "",
@@ -1522,7 +1760,81 @@
         }
       });
 
-      // ==================== TAMBAH / EDIT SOAL MANUAL ====================
+      // ==================== PENGISIAN SOAL CEPAT & GAMBAR SOAL ====================
+      function setQuickKeySelection(keyLetter) {
+        const val = (keyLetter || "A").toUpperCase();
+        document.getElementById("soalKunciPG").value = val;
+        document.querySelectorAll(".quick-key-btn").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.key === val);
+        });
+      }
+
+      document.querySelectorAll(".quick-key-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          setQuickKeySelection(btn.dataset.key);
+        });
+      });
+
+      function compressImageFileToBase64(file, maxWidth = 720, quality = 0.78) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement("canvas");
+              let w = img.width;
+              let h = img.height;
+              if (w > maxWidth) {
+                h = Math.round((h * maxWidth) / w);
+                w = maxWidth;
+              }
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img, 0, 0, w, h);
+              resolve(canvas.toDataURL("image/jpeg", quality));
+            };
+            img.onerror = reject;
+            img.src = ev.target.result;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function setSoalImagePreview(dataUrl) {
+        document.getElementById("soalImageData").value = dataUrl || "";
+        const box = document.getElementById("adminSoalImgPreviewBox");
+        const img = document.getElementById("adminSoalImgPreview");
+        const delBtn = document.getElementById("btnRemoveSoalImage");
+        if (dataUrl) {
+          img.src = dataUrl;
+          box.classList.remove("hidden");
+          delBtn.classList.remove("hidden");
+        } else {
+          img.src = "";
+          box.classList.add("hidden");
+          delBtn.classList.add("hidden");
+        }
+      }
+
+      document.getElementById("soalImageFile").addEventListener("change", async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        try {
+          const compressed = await compressImageFileToBase64(file);
+          setSoalImagePreview(compressed);
+          toast("Gambar soal berhasil dilampirkan.");
+        } catch (err) {
+          toast("Gagal memuat file gambar.");
+        }
+      });
+
+      document.getElementById("btnRemoveSoalImage").addEventListener("click", () => {
+        document.getElementById("soalImageFile").value = "";
+        setSoalImagePreview("");
+      });
+
       function populateSelectPaketSoal() {
         const sel = document.getElementById("selectPaketForSoal");
         const prev = sel.value;
@@ -1545,19 +1857,47 @@
       document.getElementById("soalJenis").addEventListener("change", () => {
         const j = document.getElementById("soalJenis").value;
         document.getElementById("boxOpsiPG").classList.toggle("hidden", j !== "PG");
-        document.getElementById("boxOpsiIsian").classList.toggle("hidden", j !== "ISIAN");
+        document.getElementById("boxOpsiIsian").classList.toggle("hidden", j === "PG");
       });
 
-      function resetFormSoal() {
-        document.getElementById("editingSoalId").value = "";
-        document.getElementById("formSaveSoal").reset();
-        document.getElementById("boxOpsiPG").classList.remove("hidden");
-        document.getElementById("boxOpsiIsian").classList.add("hidden");
-        document.getElementById("btnSubmitSoal").textContent = "Simpan Soal Baru";
-        document.getElementById("btnCancelEditSoal").classList.add("hidden");
+      function updateSoalNumberIndicator() {
+        const paketId = document.getElementById("selectPaketForSoal").value;
+        const count = appData.soalList.filter((s) => s.paketId === paketId).length;
+        const editId = document.getElementById("editingSoalId").value;
+        document.getElementById("soalNumberIndicator").textContent = editId
+          ? "Mode Edit Butir Soal"
+          : `Menambahkan Soal Ke-${count + 1}`;
       }
 
-      document.getElementById("btnCancelEditSoal").addEventListener("click", resetFormSoal);
+      function resetFormSoal(keepJenis = false) {
+        const prevJenis = document.getElementById("soalJenis").value;
+        document.getElementById("editingSoalId").value = "";
+        document.getElementById("soalTeks").value = "";
+        document.getElementById("soalOptA").value = "";
+        document.getElementById("soalOptB").value = "";
+        document.getElementById("soalOptC").value = "";
+        document.getElementById("soalOptD").value = "";
+        document.getElementById("soalKunciIsian").value = "";
+        document.getElementById("soalImageFile").value = "";
+        setSoalImagePreview("");
+        setQuickKeySelection("A");
+
+        if (!keepJenis) {
+          document.getElementById("soalJenis").value = "PG";
+        } else {
+          document.getElementById("soalJenis").value = prevJenis;
+        }
+
+        const j = document.getElementById("soalJenis").value;
+        document.getElementById("boxOpsiPG").classList.toggle("hidden", j !== "PG");
+        document.getElementById("boxOpsiIsian").classList.toggle("hidden", j === "PG");
+        document.getElementById("formSoalHeading").textContent = "Pengisian Butir Soal Cepat & Mudah";
+        document.getElementById("btnSubmitSoal").textContent = "Simpan & Lanjut Soal Berikutnya";
+        document.getElementById("btnCancelEditSoal").classList.add("hidden");
+        updateSoalNumberIndicator();
+      }
+
+      document.getElementById("btnCancelEditSoal").addEventListener("click", () => resetFormSoal(false));
 
       document.getElementById("formSaveSoal").addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -1569,14 +1909,14 @@
 
         const editId = document.getElementById("editingSoalId").value;
         const jenis = document.getElementById("soalJenis").value;
-        const bobot = Number(document.getElementById("soalBobot").value) || 10;
+        const imageData = document.getElementById("soalImageData").value || "";
         const pertanyaan = document.getElementById("soalTeks").value.trim();
 
         const objSoal = {
           id: editId || "soal-" + Date.now(),
           paketId,
           jenis,
-          bobot,
+          imageData,
           pertanyaan,
           opsiA: jenis === "PG" ? document.getElementById("soalOptA").value.trim() : "",
           opsiB: jenis === "PG" ? document.getElementById("soalOptB").value.trim() : "",
@@ -1585,23 +1925,23 @@
           kunci:
             jenis === "PG"
               ? document.getElementById("soalKunciPG").value
-              : jenis === "ISIAN"
-              ? document.getElementById("soalKunciIsian").value.trim()
-              : "Manual"
+              : document.getElementById("soalKunciIsian").value.trim()
         };
 
         if (editId) {
           const idx = appData.soalList.findIndex((s) => s.id === editId);
           if (idx !== -1) appData.soalList[idx] = objSoal;
           toast("Perubahan soal berhasil disimpan.");
+          resetFormSoal(false);
         } else {
           appData.soalList.push(objSoal);
-          toast("Soal baru berhasil ditambahkan.");
+          toast("Soal tersimpan! Silakan langsung isi soal berikutnya.");
+          resetFormSoal(true);
+          document.getElementById("soalTeks").focus();
         }
 
         saveLocal();
         await pushBankSoalToSheets();
-        resetFormSoal();
         renderPaketTable();
         renderSoalTable();
       });
@@ -1610,6 +1950,7 @@
         const paketId = document.getElementById("selectPaketForSoal").value;
         const tbody = document.getElementById("tbodySoal");
         tbody.innerHTML = "";
+        updateSoalNumberIndicator();
 
         const items = appData.soalList.filter((s) => s.paketId === paketId);
         if (items.length === 0) {
@@ -1619,12 +1960,15 @@
 
         items.forEach((s, idx) => {
           const tr = document.createElement("tr");
+          const imgThumb = s.imageData
+            ? `<img src="${s.imageData}" alt="Gambar" style="height: 36px; border-radius: 4px;" />`
+            : "-";
           tr.innerHTML = `
             <td>${idx + 1}</td>
-            <td>${s.jenis}</td>
+            <td>${s.jenis === "PG" ? "Pilihan Ganda" : s.jenis === "ISIAN" ? "Isian Singkat" : "Esai"}</td>
+            <td>${imgThumb}</td>
             <td>${s.pertanyaan}</td>
-            <td><strong>${s.kunci || "-"}</strong></td>
-            <td>${s.bobot}</td>
+            <td><strong>${s.kunci || "(Diperiksa Guru)"}</strong></td>
             <td>
               <button type="button" class="btn btn-secondary btn-sm" data-edit-soal="${s.id}">Edit</button>
               <button type="button" class="btn btn-danger btn-sm" data-del-soal="${s.id}">Hapus</button>
@@ -1639,19 +1983,22 @@
             if (!s) return;
             document.getElementById("editingSoalId").value = s.id;
             document.getElementById("soalJenis").value = s.jenis;
-            document.getElementById("soalBobot").value = s.bobot;
             document.getElementById("soalTeks").value = s.pertanyaan;
             document.getElementById("soalOptA").value = s.opsiA || "";
             document.getElementById("soalOptB").value = s.opsiB || "";
             document.getElementById("soalOptC").value = s.opsiC || "";
             document.getElementById("soalOptD").value = s.opsiD || "";
-            if (s.jenis === "PG") document.getElementById("soalKunciPG").value = s.kunci || "A";
-            if (s.jenis === "ISIAN") document.getElementById("soalKunciIsian").value = s.kunci || "";
+            setSoalImagePreview(s.imageData || "");
+
+            if (s.jenis === "PG") setQuickKeySelection(s.kunci || "A");
+            else document.getElementById("soalKunciIsian").value = s.kunci || "";
 
             document.getElementById("boxOpsiPG").classList.toggle("hidden", s.jenis !== "PG");
-            document.getElementById("boxOpsiIsian").classList.toggle("hidden", s.jenis !== "ISIAN");
+            document.getElementById("boxOpsiIsian").classList.toggle("hidden", s.jenis === "PG");
+            document.getElementById("formSoalHeading").textContent = "Edit Butir Soal";
             document.getElementById("btnSubmitSoal").textContent = "Simpan Perubahan Soal";
             document.getElementById("btnCancelEditSoal").classList.remove("hidden");
+            updateSoalNumberIndicator();
             document.getElementById("soalTeks").focus();
           });
         });
@@ -1669,39 +2016,85 @@
         });
       }
 
-      // ==================== REKAP NILAI ====================
-      function renderRekapTable() {
+      // ==================== REKAP NILAI DIKELOMPOKKAN PER KELAS & PER MAPEL ====================
+      function updateRekapMapelFilterOptions() {
+        const sel = document.getElementById("filterRekapMapel");
+        const prev = sel.value;
+        const mapelSet = new Set();
+        appData.paketList.forEach((p) => { if (p.mapel) mapelSet.add(p.mapel); });
+        appData.rekapList.forEach((r) => { if (r.mapel) mapelSet.add(r.mapel); });
+
+        sel.innerHTML = '<option value="SEMUA">Semua Mata Pelajaran</option>';
+        Array.from(mapelSet).sort().forEach((m) => {
+          const opt = document.createElement("option");
+          opt.value = m;
+          opt.textContent = m;
+          sel.appendChild(opt);
+        });
+        if (prev && (prev === "SEMUA" || mapelSet.has(prev))) sel.value = prev;
+      }
+
+      function getFilteredSortedRekap() {
         const kelas = document.getElementById("filterRekapKelas").value;
-        const mapel = document.getElementById("filterRekapMapel").value.trim().toLowerCase();
+        const mapel = document.getElementById("filterRekapMapel").value;
         const nama = document.getElementById("filterRekapNama").value.trim().toLowerCase();
 
-        const filtered = appData.rekapList.filter((r) => {
-          const okKelas = kelas === "SEMUA" || r.kelas === kelas;
-          const okMapel = !mapel || (r.mapel || "").toLowerCase().includes(mapel);
-          const okNama =
-            !nama ||
-            (r.nama || "").toLowerCase().includes(nama) ||
-            (r.nisn || "").toLowerCase().includes(nama);
-          return okKelas && okMapel && okNama;
-        });
+        return appData.rekapList
+          .filter((r) => {
+            const okKelas = kelas === "SEMUA" || r.kelas === kelas;
+            const okMapel = mapel === "SEMUA" || r.mapel === mapel;
+            const okNama =
+              !nama ||
+              (r.nama || "").toLowerCase().includes(nama) ||
+              (r.nisn || "").toLowerCase().includes(nama);
+            return okKelas && okMapel && okNama;
+          })
+          .sort((a, b) => {
+            const cKelas = (a.kelas || "").localeCompare(b.kelas || "");
+            if (cKelas !== 0) return cKelas;
+            const cMapel = (a.mapel || "").localeCompare(b.mapel || "");
+            if (cMapel !== 0) return cMapel;
+            return (a.nama || "").localeCompare(b.nama || "");
+          });
+      }
+
+      function renderRekapTable() {
+        updateRekapMapelFilterOptions();
+        const filtered = getFilteredSortedRekap();
 
         const tbody = document.getElementById("tbodyRekap");
         tbody.innerHTML = "";
         if (filtered.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="9">Belum ada data hasil ujian siswa.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="10">Belum ada data hasil ujian siswa.</td></tr>';
           return;
         }
 
+        let currentGroup = "";
+        let groupCounter = 0;
+
         filtered.forEach((r, idx) => {
+          const groupKey = `${r.kelas} — Mata Pelajaran: ${r.mapel}`;
+          if (groupKey !== currentGroup) {
+            currentGroup = groupKey;
+            groupCounter = 0;
+            const groupCount = filtered.filter((x) => `${x.kelas} — Mata Pelajaran: ${x.mapel}` === groupKey).length;
+            const gTr = document.createElement("tr");
+            gTr.className = "group-header-row";
+            gTr.innerHTML = `<td colspan="10">Kelas ${r.kelas} | Mata Pelajaran: ${r.mapel} (${groupCount} Peserta)</td>`;
+            tbody.appendChild(gTr);
+          }
+
+          groupCounter += 1;
           const tr = document.createElement("tr");
           tr.innerHTML = `
+            <td>${groupCounter}</td>
             <td>${r.waktu || "-"}</td>
             <td>${r.nama}</td>
             <td>${r.nisn}</td>
             <td>${r.kelas}</td>
-            <td>${r.hari}</td>
             <td>${r.mapel}</td>
-            <td><strong>${r.nilai}</strong></td>
+            <td><strong>${r.nilai || "-"}</strong></td>
+            <td>${r.statusEsai || "-"}</td>
             <td>${r.pelanggaran || "0x"}</td>
             <td><button type="button" class="btn btn-secondary btn-sm" data-view-det="${idx}">Lihat</button></td>
           `;
@@ -1714,8 +2107,9 @@
             if (!item) return;
             document.getElementById("detailRekapContent").innerHTML = `
               <p><strong>Nama:</strong> ${item.nama} (${item.nisn})</p>
-              <p><strong>Ujian:</strong> ${item.mapel} — ${item.kelas} (${item.hari})</p>
-              <p><strong>Nilai:</strong> ${item.nilai}</p>
+              <p><strong>Kelas / Mapel:</strong> ${item.kelas} — ${item.mapel} (${item.hari})</p>
+              <p><strong>Hasil Pilihan Ganda:</strong> ${item.nilai}</p>
+              <p><strong>Status Soal Esai / Isian:</strong> ${item.statusEsai || "-"}</p>
               <p><strong>Rincian Jawaban:</strong><br/>${item.detail || "-"}</p>
             `;
             document.getElementById("modalDetailRekap").classList.add("open");
@@ -1736,11 +2130,12 @@
       document.getElementById("btnSyncAllNow").addEventListener("click", () => pullAllFromSheets(false));
 
       document.getElementById("btnExportCsv").addEventListener("click", () => {
-        const headers = ["Waktu", "Nama", "NISN", "Kelas", "Hari", "Mapel", "Nilai", "Pelanggaran", "Detail"];
+        const rows = getFilteredSortedRekap();
+        const headers = ["No", "Waktu", "Nama", "NISN", "Kelas", "Hari", "Mapel", "Hasil PG (Benar/Salah)", "Status Esai/Isian", "Pelanggaran", "Detail"];
         const lines = [
           headers.join(","),
-          ...appData.rekapList.map((r) =>
-            [r.waktu, r.nama, r.nisn, r.kelas, r.hari, r.mapel, r.nilai, r.pelanggaran, r.detail]
+          ...rows.map((r, i) =>
+            [i + 1, r.waktu, r.nama, r.nisn, r.kelas, r.hari, r.mapel, r.nilai, r.statusEsai || "-", r.pelanggaran, r.detail]
               .map((v) => `"${String(v || "").replace(/"/g, '""')}"`)
               .join(",")
           )
@@ -1749,7 +2144,9 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "rekap-nilai-siswa.csv";
+        const kFilter = document.getElementById("filterRekapKelas").value.replace(/\s+/g, "_");
+        const mFilter = document.getElementById("filterRekapMapel").value.replace(/\s+/g, "_");
+        a.download = `rekap-nilai-${kFilter}-${mFilter}.csv`;
         a.click();
         URL.revokeObjectURL(url);
       });
