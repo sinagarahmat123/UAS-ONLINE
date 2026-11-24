@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CBT Ujian Semester — UPTD SPF SMP N 1 KUTA BAHARU</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    .topbar {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 12px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .topbar h1 { margin: 0; font-size: 16px; }
+    .topbar p { margin: 2px 0 0; font-size: 12px; color: #94a3b8; }
+    .topbar-right { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+    .badge-status {
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+    }
+    .badge-online { background: #064e3b; color: #a7f3d0; border-color: #059669; }
+
+    .btn {
+      padding: 8px 14px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-success { background: #16a34a; color: #fff; }
+    .btn-success:hover { background: #15803d; }
+    .btn-secondary { background: #f1f5f9; color: #1e293b; border-color: #cbd5e1; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+    .container { max-width: 1120px; margin: 20px auto; padding: 0 16px; }
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .card h2 { margin: 0 0 6px; font-size: 17px; }
+    .card-desc { margin: 0 0 14px; font-size: 13px; color: #64748b; }
+
+    .form-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+    .form-group { flex: 1 1 200px; display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: 12px; font-weight: 600; color: #334155; }
+
+    input[type="text"], input[type="number"], input[type="password"], input[type="url"], input[type="search"], input[type="file"], select, textarea {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #0f172a;
+      background: #fff;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { outline: 2px solid #93c5fd; outline-offset: 1px; }
+
+    .inline-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+    /* Student Exam Screen */
+    .exam-header {
+      background: #1e293b;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .timer-box {
+      background: #dc2626;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .option-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      background: #fff;
+    }
+    .option-item:hover { background: #f8fafc; }
+    .option-item.selected { background: #eff6ff; border-color: #2563eb; }
+    .nav-numbers { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .num-btn {
+      width: 36px; height: 36px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .num-btn.answered { background: #16a34a; color: #fff; border-color: #16a34a; }
+    .num-btn.current { outline: 2px solid #2563eb; }
+
+    /* Admin Layout */
+    .admin-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .tab-btn {
+      padding: 9px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tab-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+
+    .table-wrap { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 9px 11px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; font-weight: 700; color: #334155; }
+
+    .alert-info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .alert-warn {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-card {
+      background: #fff;
+      border-radius: 8px;
+      max-width: 460px;
+      width: 100%;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .modal-header h3 { margin: 0; font-size: 16px; }
+    .close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b; }
+
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      background: #0f172a;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: none;
+      z-index: 1200;
+    }
+    .toast.show { display: block; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>CBT UJIAN SEMESTER — UPTD SPF SMP N 1 KUTA BAHARU</h1>
+      <p>Portal Ujian Siswa &amp; Panel Pengelola Guru/Admin</p>
+    </div>
+    <div class="topbar-right">
+      <span id="syncStatusBadge" class="badge-status">Mode Lokal (Belum Terhubung Sheets)</span>
+      <button type="button" id="btnSwitchStudent" class="btn btn-secondary btn-sm">Halaman Siswa</button>
+      <button type="button" id="btnSwitchAdmin" class="btn btn-primary btn-sm">Panel Admin / Guru</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- ==================== VIEW 1: PORTAL LOGIN SISWA ==================== -->
+    <section id="viewStudentLogin">
+      <div class="card">
+        <h2>Portal Peserta Didik — Mulai Ujian</h2>
+        <p class="card-desc">Lengkapi identitas diri, pilih kelas, hari ujian, mata pelajaran, lalu masukkan token dari pengawas.</p>
+
+        <div id="studentSyncHint" class="alert-warn">
+          <strong>Info Koneksi:</strong> Agar jawaban dari HP siswa langsung masuk ke Panel Admin guru, pastikan Guru/Admin sudah mengisi <strong>URL Google Apps Script Web App</strong> di menu Pengaturan Admin (atau bagikan link khusus dari menu Link Akses HP Siswa).
+        </div>
+
+        <form id="studentStartForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="stuName">Nama Lengkap Siswa *</label>
+              <input type="text" id="stuName" placeholder="Contoh: Ahmad Fauzi" required />
+            </div>
+            <div class="form-group">
+              <label for="stuNisn">NISN / Nomor Peserta *</label>
+              <input type="text" id="stuNisn" placeholder="Contoh: 0123456789" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="stuKelas">Pilih Kelas *</label>
+              <select id="stuKelas" required>
+                <option value="">-- Pilih Kelas --</option>
+                <option value="VII (Tujuh)">VII (Tujuh)</option>
+                <option value="VIII (Delapan)">VIII (Delapan)</option>
+                <option value="IX (Sembilan)">IX (Sembilan)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="stuHari">Hari Ujian *</label>
+              <select id="stuHari" required>
+                <option value="">-- Pilih Hari --</option>
+                <option value="Senin">Senin</option>
+                <option value="Selasa">Selasa</option>
+                <option value="Rabu">Rabu</option>
+                <option value="Kamis">Kamis</option>
+                <option value="Jumat">Jumat</option>
+                <option value="Sabtu">Sabtu</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="stuPaket">Pilih Paket Ujian / Mapel *</label>
+              <select id="stuPaket" required>
+                <option value="">-- Pilih Kelas &amp; Hari Dulu --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group" style="max-width: 320px;">
+              <label for="stuToken">Kode Token Ujian *</label>
+              <input type="text" id="stuToken" placeholder="Masukkan token dari pengawas" />
+            </div>
+          </div>
+
+          <div class="alert-info">
+            <strong>Ketentuan Ujian:</strong><br />
+            1. Jangan berpindah tab atau keluar dari halaman ujian (batas toleransi 3 kali peringatan; ke-3 otomatis dikumpulkan).<br />
+            2. Setelah selesai, jawaban otomatis dikirim ke server Google Sheets / Panel Admin.
+          </div>
+
+          <button type="submit" class="btn btn-success">Mulai Ujian Sekarang</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: LEMBAR UJIAN SISWA ==================== -->
+    <section id="viewStudentExam" class="hidden">
+      <div class="exam-header">
+        <div>
+          <strong id="examMapelTitle">Mata Pelajaran</strong>
+          <div style="font-size: 12px; color: #cbd5e1;">
+            Peserta: <span id="examStudentInfo">-</span> | Pelanggaran Tab: <strong id="examViolationInfo">0 / 3</strong>
+          </div>
+        </div>
+        <div class="inline-group">
+          <div class="timer-box" id="examTimerDisplay">00:00</div>
+          <button type="button" id="btnFinishExam" class="btn btn-success">Kumpulkan Ujian</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <strong id="questionCounterLabel">Soal No. 1</strong>
+          <span id="questionTypeBadge" class="badge-status">Pilihan Ganda</span>
+        </div>
+
+        <p id="questionTextDisplay" style="font-size: 15px; line-height: 1.6; margin: 10px 0 14px;"></p>
+        <div id="answerArea"></div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 18px;">
+          <button type="button" id="btnPrevSoal" class="btn btn-secondary">&larr; Sebelumnya</button>
+          <button type="button" id="btnNextSoal" class="btn btn-primary">Berikutnya &rarr;</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <strong>Navigasi Nomor Soal</strong>
+        <div id="questionNavGrid" class="nav-numbers"></div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: HALAMAN SELESAI UJIAN ==================== -->
+    <section id="viewStudentDone" class="hidden">
+      <div class="card">
+        <h2 style="color: #15803d;">&#10004; Ujian Telah Selesai Dikerjakan</h2>
+        <p class="card-desc">Jawaban Anda telah tercatat. Sesuai kebijakan ujian, nilai/skor tidak ditampilkan di layar siswa.</p>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; font-size: 13px; line-height: 1.8; margin-bottom: 14px;">
+          <div><strong>Nama Peserta:</strong> <span id="doneNama">-</span></div>
+          <div><strong>NISN:</strong> <span id="doneNisn">-</span></div>
+          <div><strong>Kelas / Hari:</strong> <span id="doneKelasHari">-</span></div>
+          <div><strong>Mata Pelajaran:</strong> <span id="doneMapel">-</span></div>
+          <div><strong>Status Pengiriman Pusat:</strong> <span id="doneSendStatus">-</span></div>
+          <div><strong>Waktu Selesai:</strong> <span id="doneWaktu">-</span></div>
+        </div>
+
+        <div class="inline-group">
+          <button type="button" id="btnResendCenter" class="btn btn-primary">Kirim Ulang ke Rekap Pusat</button>
+          <button type="button" id="btnBackHome" class="btn btn-secondary">Kembali ke Halaman Awal</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: PANEL ADMIN / GURU ==================== -->
+    <section id="viewAdminPanel" class="hidden">
+      <div class="card" style="padding: 14px 18px;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;">
+          <div>
+            <strong>Dasbor Pengelola &amp; Guru</strong>
+            <div style="font-size: 12px; color: #64748b;">Semua perubahan paket &amp; soal otomatis tersimpan di browser dan disinkronkan ke Google Sheets jika terhubung.</div>
+          </div>
+          <div class="inline-group">
+            <button type="button" id="btnSyncAllNow" class="btn btn-success btn-sm">Sinkronkan Data dari Google Sheets</button>
+            <button type="button" id="btnAdminLogout" class="btn btn-danger btn-sm">Keluar Admin</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-tabs">
+        <button type="button" class="tab-btn active" data-admin-tab="admPaket">1. Paket Ujian &amp; Token</button>
+        <button type="button" class="tab-btn" data-admin-tab="admSoal">2. Tambah, Edit &amp; Impor Word</button>
+        <button type="button" class="tab-btn" data-admin-tab="admRekap">3. Rekap Nilai Siswa</button>
+        <button type="button" class="tab-btn" data-admin-tab="admLink">4. Link Akses HP Siswa</button>
+        <button type="button" class="tab-btn" data-admin-tab="admPengaturan">5. Pengaturan &amp; Sandi</button>
+      </div>
+
+      <!-- TAB 1: PAKET UJIAN -->
+      <div id="admPaket" class="admin-panel active">
+        <div class="card">
+          <h2>Tambah Paket Ujian per Kelas &amp; Hari</h2>
+          <form id="formAddPaket">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="admKelas">Kelas *</label>
+                <select id="admKelas" required>
+                  <option value="VII (Tujuh)">VII (Tujuh)</option>
+                  <option value="VIII (Delapan)">VIII (Delapan)</option>
+                  <option value="IX (Sembilan)">IX (Sembilan)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="admHari">Hari Ujian *</label>
+                <select id="admHari" required>
+                  <option value="Senin">Senin</option>
+                  <option value="Selasa">Selasa</option>
+                  <option value="Rabu">Rabu</option>
+                  <option value="Kamis">Kamis</option>
+                  <option value="Jumat">Jumat</option>
+                  <option value="Sabtu">Sabtu</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="admMapel">Mata Pelajaran *</label>
+                <input type="text" id="admMapel" placeholder="Contoh: Matematika" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group" style="max-width: 180px;">
+                <label for="admDurasi">Durasi (Menit) *</label>
+                <input type="number" id="admDurasi" min="5" max="300" value="90" required />
+              </div>
+              <div class="form-group" style="max-width: 280px;">
+                <label for="admToken">Kode Token *</label>
+                <div class="inline-group">
+                  <input type="text" id="admToken" placeholder="Contoh: MTK7A" required />
+                  <button type="button" id="btnRandomToken" class="btn btn-secondary">Acak</button>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">+ Simpan Paket Ujian</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Daftar Paket Ujian</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Kelas</th>
+                  <th>Hari</th>
+                  <th>Mata Pelajaran</th>
+                  <th>Durasi</th>
+                  <th>Token</th>
+                  <th>Jumlah Soal</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyPaket"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: TAMBAH, EDIT & IMPOR WORD -->
+      <div id="admSoal" class="admin-panel">
+        <div class="card">
+          <h2>Pilih Paket Ujian &amp; Impor Soal dari Microsoft Word (.docx)</h2>
+          <div class="form-group" style="max-width: 460px; margin-bottom: 14px;">
+            <label for="selectPaketForSoal">Pilih Paket Ujian yang Dikelola:</label>
+            <select id="selectPaketForSoal"></select>
+          </div>
+
+          <div class="alert-info">
+            <strong>Impor Soal Sekaligus dari File Word (.docx):</strong><br />
+            Susun soal di Microsoft Word dengan format per soal (pisahkan antarsoal dengan baris kosong):<br />
+            <code>1. Ibu kota negara Indonesia adalah...</code><br />
+            <code>A. Bandung</code> | <code>B. Surabaya</code> | <code>C. Jakarta</code> | <code>D. Medan</code><br />
+            <code>KUNCI: C</code> (untuk Isian/Uraian tanpa opsi A-D, cukup tulis pertanyaan lalu <code>KUNCI: jawaban</code> atau tanpa <code>KUNCI:</code> untuk uraian).
+          </div>
+
+          <div class="form-row" style="align-items: flex-end;">
+            <div class="form-group" style="max-width: 360px;">
+              <label for="inputWordFile">Pilih Dokumen Word (.docx) dari Laptop:</label>
+              <input type="file" id="inputWordFile" accept=".docx" />
+            </div>
+            <div class="inline-group" style="margin-bottom: 5px;">
+              <button type="button" id="btnImportWord" class="btn btn-success">Impor Soal dari Word (.docx)</button>
+              <button type="button" id="btnDownloadWordTemplate" class="btn btn-secondary">Unduh Contoh Format (.txt)</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Tambah / Edit Butir Soal Manual</h2>
+          <form id="formSaveSoal">
+            <input type="hidden" id="editingSoalId" value="" />
+            <div class="form-row">
+              <div class="form-group" style="max-width: 260px;">
+                <label for="soalJenis">Jenis Soal *</label>
+                <select id="soalJenis">
+                  <option value="PG">Pilihan Ganda</option>
+                  <option value="ISIAN">Isian Singkat</option>
+                  <option value="URAIAN">Uraian / Esai</option>
+                </select>
+              </div>
+              <div class="form-group" style="max-width: 160px;">
+                <label for="soalBobot">Bobot Poin *</label>
+                <input type="number" id="soalBobot" min="1" max="100" value="10" required />
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label for="soalTeks">Pertanyaan / Teks Soal *</label>
+              <textarea id="soalTeks" placeholder="Tulis pertanyaan di sini..." required></textarea>
+            </div>
+
+            <div id="boxOpsiPG">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="soalOptA">Opsi A *</label>
+                  <input type="text" id="soalOptA" placeholder="Pilihan A" />
+                </div>
+                <div class="form-group">
+                  <label for="soalOptB">Opsi B *</label>
+                  <input type="text" id="soalOptB" placeholder="Pilihan B" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="soalOptC">Opsi C *</label>
+                  <input type="text" id="soalOptC" placeholder="Pilihan C" />
+                </div>
+                <div class="form-group">
+                  <label for="soalOptD">Opsi D *</label>
+                  <input type="text" id="soalOptD" placeholder="Pilihan D" />
+                </div>
+              </div>
+              <div class="form-group" style="max-width: 220px; margin-bottom: 12px;">
+                <label for="soalKunciPG">Kunci Jawaban Benar *</label>
+                <select id="soalKunciPG">
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="boxOpsiIsian" class="hidden" style="margin-bottom: 12px;">
+              <div class="form-group" style="max-width: 420px;">
+                <label for="soalKunciIsian">Kunci Jawaban Acuan (Tidak peka huruf besar/kecil)</label>
+                <input type="text" id="soalKunciIsian" placeholder="Contoh: Jakarta" />
+              </div>
+            </div>
+
+            <div class="inline-group">
+              <button type="submit" id="btnSubmitSoal" class="btn btn-primary">Simpan Soal Baru</button>
+              <button type="button" id="btnCancelEditSoal" class="btn btn-secondary hidden">Batal Edit</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Daftar Soal pada Paket Terpilih</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Jenis</th>
+                  <th>Pertanyaan</th>
+                  <th>Kunci</th>
+                  <th>Bobot</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tbodySoal"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: REKAP NILAI SISWA -->
+      <div id="admRekap" class="admin-panel">
+        <div class="card">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <div>
+              <h2>Rekap Hasil &amp; Nilai Ujian Siswa</h2>
+              <p class="card-desc" style="margin-bottom: 0;">Klik <strong>Muat Ulang dari Google Sheets</strong> untuk menarik hasil terbaru yang dikerjakan siswa di HP masing-masing.</p>
+            </div>
+            <div class="inline-group">
+              <button type="button" id="btnPullRekap" class="btn btn-primary btn-sm">Muat Ulang dari Google Sheets</button>
+              <button type="button" id="btnExportCsv" class="btn btn-secondary btn-sm">Unduh Excel (.csv)</button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="filterRekapKelas">Filter Kelas</label>
+              <select id="filterRekapKelas">
+                <option value="SEMUA">Semua Kelas</option>
+                <option value="VII (Tujuh)">VII (Tujuh)</option>
+                <option value="VIII (Delapan)">VIII (Delapan)</option>
+                <option value="IX (Sembilan)">IX (Sembilan)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="filterRekapMapel">Filter Mata Pelajaran</label>
+              <input type="text" id="filterRekapMapel" placeholder="Cari mapel..." />
+            </div>
+            <div class="form-group">
+              <label for="filterRekapNama">Cari Nama / NISN</label>
+              <input type="search" id="filterRekapNama" placeholder="Ketik nama atau NISN..." />
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Waktu</th>
+                  <th>Nama Siswa</th>
+                  <th>NISN</th>
+                  <th>Kelas</th>
+                  <th>Hari</th>
+                  <th>Mapel</th>
+                  <th>Nilai</th>
+                  <th>Pelanggaran</th>
+                  <th>Detail Jawaban</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyRekap"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: LINK AKSES HP SISWA -->
+      <div id="admLink" class="admin-panel">
+        <div class="card">
+          <h2>Link Khusus untuk Dibagikan ke HP Siswa</h2>
+          <p class="card-desc">
+            Gunakan tombol <strong>Salin Link Ujian Siswa</strong> di bawah ini lalu kirimkan ke grup WhatsApp kelas. Link ini sudah otomatis menyertakan alamat Google Apps Script sehingga HP siswa langsung tahu ke mana jawaban harus dikirim!
+          </p>
+
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label for="generatedStudentLink">Link Siap Pakai untuk Siswa (Otomatis Terisi)</label>
+            <div class="inline-group">
+              <input type="text" id="generatedStudentLink" readonly />
+              <button type="button" id="btnCopyStudentLink" class="btn btn-primary">Salin Link Ujian Siswa</button>
+            </div>
+          </div>
+
+          <div class="alert-info">
+            <strong>Mengapa link ini penting?</strong> Karena file di GitHub Pages bersifat statis, menyertakan parameter <code>?gas=...</code> di akhir link membuat HP siswa otomatis terhubung ke Google Sheets sekolah tanpa perlu siswa mengatur apa pun.
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: PENGATURAN GOOGLE SHEETS & PASSWORD -->
+      <div id="admPengaturan" class="admin-panel">
+        <div class="card">
+          <h2>Koneksi Google Sheets (Agar Jawaban Siswa &amp; Soal Tersimpan Terpusat)</h2>
+          <form id="formSaveSettings">
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label for="inputGasUrl">URL Google Apps Script Web App (Berakhiran /exec) *</label>
+              <input type="url" id="inputGasUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec" />
+            </div>
+
+            <div class="form-group" style="max-width: 240px; margin-bottom: 12px;">
+              <label for="inputMaxTab">Batas Pelanggaran Pindah Tab</label>
+              <input type="number" id="inputMaxTab" min="1" max="10" value="3" />
+            </div>
+
+            <div class="inline-group">
+              <button type="submit" class="btn btn-primary">Simpan Pengaturan &amp; Uji Koneksi</button>
+              <button type="button" id="btnPushBankSoal" class="btn btn-success">Simpan Bank Soal ke Google Sheets</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Ganti atau Reset Password Admin</h2>
+          <form id="formChangePass" style="max-width: 420px;">
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label for="passOld">Password Saat Ini *</label>
+              <input type="password" id="passOld" placeholder="Masukkan password saat ini" required />
+            </div>
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label for="passNew">Password Baru (Min. 4 Karakter) *</label>
+              <input type="password" id="passNew" minlength="4" placeholder="Masukkan password baru" required />
+            </div>
+            <div class="inline-group">
+              <button type="submit" class="btn btn-primary">Perbarui Password</button>
+              <button type="button" id="btnResetPasswordInPanel" class="btn btn-danger">Reset Sandi ke Bawaan</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL LOGIN ADMIN -->
+  <div id="modalLoginAdmin" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Login Panel Admin / Guru</h3>
+        <button type="button" class="close-btn" id="btnCloseLoginModal">&times;</button>
+      </div>
+      <form id="formAdminLogin">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label for="adminPassInput">Password Admin</label>
+          <input type="password" id="adminPassInput" placeholder="Masukkan password admin..." required />
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btnForgotResetPass" class="btn btn-secondary btn-sm">Lupa / Reset Sandi</button>
+          <div class="inline-group">
+            <button type="button" class="btn btn-secondary" id="btnCancelLogin">Batal</button>
+            <button type="submit" class="btn btn-primary">Masuk</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DETAIL JAWABAN -->
+  <div id="modalDetailRekap" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Detail Hasil Jawaban Siswa</h3>
+        <button type="button" class="close-btn" id="btnCloseDetailModal">&times;</button>
+      </div>
+      <div id="detailRekapContent" style="font-size: 13px; line-height: 1.6; max-height: 360px; overflow-y: auto;"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = "cbt_smpn1_kutabaharu_v3";
+      const SESSION_KEY = "cbt_smpn1_admin_logged_in";
+      const DEFAULT_ADMIN_PASS = "admin123";
+
+      const defaultData = {
+        adminPassword: DEFAULT_ADMIN_PASS,
+        gasUrl: "",
+        maxTab: 3,
+        paketList: [
+          {
+            id: "pkt-1",
+            kelas: "VII (Tujuh)",
+            hari: "Senin",
+            mapel: "Matematika",
+            durasi: 60,
+            token: "MTK7A"
+          }
+        ],
+        soalList: [
+          {
+            id: "soal-1",
+            paketId: "pkt-1",
+            jenis: "PG",
+            bobot: 10,
+            pertanyaan: "Hasil dari 15 + (-7) adalah...",
+            opsiA: "8",
+            opsiB: "-8",
+            opsiC: "22",
+            opsiD: "-22",
+            kunci: "A"
+          }
+        ],
+        rekapList: []
+      };
+
+      let appData = structuredClone(defaultData);
+      let activeExam = null;
+      let timerInterval = null;
+      let lastSubmissionPayload = null;
+
+      function toast(msg) {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.classList.add("show");
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => el.classList.remove("show"), 3500);
+      }
+
+      function saveLocal() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        } catch (e) {
+          toast("Gagal menyimpan ke penyimpanan browser.");
+        }
+      }
+
+      function loadLocal() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            appData = {
+              adminPassword: parsed.adminPassword || DEFAULT_ADMIN_PASS,
+              gasUrl: parsed.gasUrl || "",
+              maxTab: Number(parsed.maxTab) || 3,
+              paketList: Array.isArray(parsed.paketList) ? parsed.paketList : structuredClone(defaultData.paketList),
+              soalList: Array.isArray(parsed.soalList) ? parsed.soalList : structuredClone(defaultData.soalList),
+              rekapList: Array.isArray(parsed.rekapList) ? parsed.rekapList : []
+            };
+          } else {
+            // Migrasi URL Google Sheets jika sebelumnya tersimpan di v2
+            const oldRaw = localStorage.getItem("cbt_smpn1_kutabaharu_v2");
+            if (oldRaw) {
+              const oldParsed = JSON.parse(oldRaw);
+              if (oldParsed && oldParsed.gasUrl) appData.gasUrl = oldParsed.gasUrl;
+              if (Array.isArray(oldParsed.paketList)) appData.paketList = oldParsed.paketList;
+              if (Array.isArray(oldParsed.soalList)) appData.soalList = oldParsed.soalList;
+              if (Array.isArray(oldParsed.rekapList)) appData.rekapList = oldParsed.rekapList;
+            }
+            appData.adminPassword = DEFAULT_ADMIN_PASS;
+            saveLocal();
+          }
+        } catch (e) {
+          appData = structuredClone(defaultData);
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const gasParam = params.get("gas");
+        if (gasParam && gasParam.startsWith("http")) {
+          appData.gasUrl = gasParam.trim();
+          saveLocal();
+        }
+      }
+
+      function isAdminLoggedIn() {
+        return sessionStorage.getItem(SESSION_KEY) === "1";
+      }
+
+      function setAdminLoggedIn(val) {
+        if (val) sessionStorage.setItem(SESSION_KEY, "1");
+        else sessionStorage.removeItem(SESSION_KEY);
+      }
+
+      function updateSyncBadge() {
+        const badge = document.getElementById("syncStatusBadge");
+        const hint = document.getElementById("studentSyncHint");
+        if (appData.gasUrl) {
+          badge.textContent = "Terhubung Google Sheets";
+          badge.classList.add("badge-online");
+          hint.classList.add("hidden");
+        } else {
+          badge.textContent = "Mode Lokal (Belum Terhubung Sheets)";
+          badge.classList.remove("badge-online");
+          hint.classList.remove("hidden");
+        }
+      }
+
+      function showView(viewId) {
+        ["viewStudentLogin", "viewStudentExam", "viewStudentDone", "viewAdminPanel"].forEach((id) => {
+          document.getElementById(id).classList.add("hidden");
+        });
+        document.getElementById(viewId).classList.remove("hidden");
+      }
+
+      // ==================== SINKRONISASI GOOGLE SHEETS ====================
+      async function pushBankSoalToSheets() {
+        if (!appData.gasUrl) return;
+        try {
+          await fetch(appData.gasUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "saveBankSoal",
+              paketList: appData.paketList,
+              soalList: appData.soalList
+            })
+          });
+        } catch (e) {
+          // Tetap tersimpan di localStorage
+        }
+      }
+
+      async function pullAllFromSheets(silent = false) {
+        if (!appData.gasUrl) {
+          if (!silent) toast("Isi URL Google Apps Script terlebih dahulu di Pengaturan.");
+          return;
+        }
+        try {
+          const res = await fetch(appData.gasUrl + "?action=getAll&t=" + Date.now());
+          const json = await res.json();
+          if (json && json.status === "ok") {
+            if (Array.isArray(json.paketList) && json.paketList.length > 0) {
+              appData.paketList = json.paketList;
+            }
+            if (Array.isArray(json.soalList) && json.soalList.length > 0) {
+              appData.soalList = json.soalList;
+            }
+            if (Array.isArray(json.rekapList)) {
+              appData.rekapList = json.rekapList;
+            }
+            saveLocal();
+            renderAllAdmin();
+            updateStudentPaketDropdown();
+            if (!silent) toast("Data soal & rekap nilai berhasil dimuat dari Google Sheets.");
+          }
+        } catch (e) {
+          if (!silent) toast("Gagal mengambil data dari Google Sheets. Periksa izin deploy 'Anyone'.");
+        }
+      }
+
+      async function sendExamResultToSheets(payload) {
+        if (!appData.gasUrl) return false;
+        try {
+          await fetch(appData.gasUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(Object.assign({ action: "submitExam" }, payload))
+          });
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      // ==================== NAVIGASI UTAMA, LOGIN & RESET SANDI ADMIN ====================
+      document.getElementById("btnSwitchStudent").addEventListener("click", () => {
+        if (activeExam) {
+          toast("Selesaikan ujian terlebih dahulu.");
+          return;
+        }
+        showView("viewStudentLogin");
+      });
+
+      document.getElementById("btnSwitchAdmin").addEventListener("click", () => {
+        if (activeExam) {
+          toast("Tidak bisa membuka panel admin saat ujian sedang berjalan.");
+          return;
+        }
+        if (isAdminLoggedIn()) {
+          showView("viewAdminPanel");
+          renderAllAdmin();
+        } else {
+          document.getElementById("adminPassInput").value = "";
+          document.getElementById("modalLoginAdmin").classList.add("open");
+        }
+      });
+
+      document.getElementById("btnCloseLoginModal").addEventListener("click", () => {
+        document.getElementById("modalLoginAdmin").classList.remove("open");
+      });
+      document.getElementById("btnCancelLogin").addEventListener("click", () => {
+        document.getElementById("modalLoginAdmin").classList.remove("open");
+      });
+
+      document.getElementById("formAdminLogin").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const pass = document.getElementById("adminPassInput").value;
+        if (pass === appData.adminPassword) {
+          setAdminLoggedIn(true);
+          document.getElementById("modalLoginAdmin").classList.remove("open");
+          showView("viewAdminPanel");
+          renderAllAdmin();
+          toast("Berhasil masuk ke Panel Admin.");
+        } else {
+          toast("Password admin salah!");
+        }
+      });
+
+      function resetAdminPasswordToDefault() {
+        appData.adminPassword = DEFAULT_ADMIN_PASS;
+        saveLocal();
+        toast("Sandi admin berhasil di-reset ke sandi bawaan sistem.");
+      }
+
+      document.getElementById("btnForgotResetPass").addEventListener("click", () => {
+        if (confirm("Reset sandi Panel Admin di browser ini kembali ke sandi awal?")) {
+          resetAdminPasswordToDefault();
+          document.getElementById("adminPassInput").value = "";
+          document.getElementById("adminPassInput").focus();
+        }
+      });
+
+      document.getElementById("btnResetPasswordInPanel").addEventListener("click", () => {
+        if (confirm("Reset sandi Panel Admin kembali ke sandi awal?")) {
+          resetAdminPasswordToDefault();
+          document.getElementById("formChangePass").reset();
+        }
+      });
+
+      document.getElementById("btnAdminLogout").addEventListener("click", () => {
+        setAdminLoggedIn(false);
+        showView("viewStudentLogin");
+        toast("Keluar dari Panel Admin.");
+      });
+
+      // Admin Sub-tabs
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+          document.querySelectorAll(".admin-panel").forEach((p) => p.classList.remove("active"));
+          btn.classList.add("active");
+          document.getElementById(btn.dataset.adminTab).classList.add("active");
+        });
+      });
+
+      // ==================== PORTAL & UJIAN SISWA ====================
+      function updateStudentPaketDropdown() {
+        const kelas = document.getElementById("stuKelas").value;
+        const hari = document.getElementById("stuHari").value;
+        const select = document.getElementById("stuPaket");
+        select.innerHTML = "";
+
+        const matched = appData.paketList.filter((p) => {
+          const okKelas = !kelas || p.kelas === kelas;
+          const okHari = !hari || p.hari === hari;
+          return okKelas && okHari;
+        });
+
+        if (matched.length === 0) {
+          const opt = document.createElement("option");
+          opt.value = "";
+          opt.textContent = "-- Tidak ada paket ujian pada kelas/hari ini --";
+          select.appendChild(opt);
+          return;
+        }
+
+        const defOpt = document.createElement("option");
+        defOpt.value = "";
+        defOpt.textContent = "-- Pilih Mata Pelajaran --";
+        select.appendChild(defOpt);
+
+        matched.forEach((p) => {
+          const opt = document.createElement("option");
+          opt.value = p.id;
+          opt.textContent = `${p.mapel} (${p.kelas} - ${p.hari})`;
+          select.appendChild(opt);
+        });
+      }
+
+      document.getElementById("stuKelas").addEventListener("change", updateStudentPaketDropdown);
+      document.getElementById("stuHari").addEventListener("change", updateStudentPaketDropdown);
+
+      document.getElementById("studentStartForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const nama = document.getElementById("stuName").value.trim();
+        const nisn = document.getElementById("stuNisn").value.trim();
+        const paketId = document.getElementById("stuPaket").value;
+        const tokenInput = document.getElementById("stuToken").value.trim().toUpperCase();
+
+        const paket = appData.paketList.find((p) => p.id === paketId);
+        if (!paket) {
+          toast("Pilih paket ujian / mata pelajaran terlebih dahulu.");
+          return;
+        }
+        if (paket.token && tokenInput !== paket.token.toUpperCase()) {
+          toast("Kode token ujian tidak sesuai!");
+          return;
+        }
+
+        const questions = appData.soalList.filter((s) => s.paketId === paket.id);
+        if (questions.length === 0) {
+          toast("Paket ujian ini belum memiliki soal. Hubungi pengawas/guru.");
+          return;
+        }
+
+        activeExam = {
+          nama,
+          nisn,
+          paket,
+          questions,
+          answers: {},
+          currentIndex: 0,
+          violations: 0,
+          remainingSeconds: (Number(paket.durasi) || 60) * 60
+        };
+
+        document.getElementById("examMapelTitle").textContent = `${paket.mapel} — ${paket.kelas} (${paket.hari})`;
+        document.getElementById("examStudentInfo").textContent = `${nama} (${nisn})`;
+        document.getElementById("examViolationInfo").textContent = `0 / ${appData.maxTab}`;
+
+        showView("viewStudentExam");
+        renderCurrentQuestion();
+        startExamTimer();
+      });
+
+      function startExamTimer() {
+        clearInterval(timerInterval);
+        function tick() {
+          if (!activeExam) return;
+          const m = Math.floor(activeExam.remainingSeconds / 60);
+          const s = activeExam.remainingSeconds % 60;
+          document.getElementById("examTimerDisplay").textContent =
+            String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+          if (activeExam.remainingSeconds <= 0) {
+            finishExam("Waktu Habis");
+            return;
+          }
+          activeExam.remainingSeconds -= 1;
+        }
+        tick();
+        timerInterval = setInterval(tick, 1000);
+      }
+
+      function renderCurrentQuestion() {
+        if (!activeExam) return;
+        const idx = activeExam.currentIndex;
+        const q = activeExam.questions[idx];
+        const total = activeExam.questions.length;
+
+        document.getElementById("questionCounterLabel").textContent = `Soal No. ${idx + 1} dari ${total}`;
+        document.getElementById("questionTypeBadge").textContent =
+          q.jenis === "PG" ? "Pilihan Ganda" : q.jenis === "ISIAN" ? "Isian Singkat" : "Uraian / Esai";
+        document.getElementById("questionTextDisplay").textContent = q.pertanyaan;
+
+        const area = document.getElementById("answerArea");
+        area.innerHTML = "";
+        const savedAns = activeExam.answers[q.id] || "";
+
+        if (q.jenis === "PG") {
+          ["A", "B", "C", "D"].forEach((huruf) => {
+            const teksOpsi = q["opsi" + huruf] || "";
+            const div = document.createElement("div");
+            div.className = "option-item" + (savedAns === huruf ? " selected" : "");
+            div.innerHTML = `<strong>${huruf}.</strong> <span>${teksOpsi}</span>`;
+            div.addEventListener("click", () => {
+              activeExam.answers[q.id] = huruf;
+              renderCurrentQuestion();
+            });
+            area.appendChild(div);
+          });
+        } else if (q.jenis === "ISIAN") {
+          const inp = document.createElement("input");
+          inp.type = "text";
+          inp.placeholder = "Ketik jawaban singkat Anda...";
+          inp.value = savedAns;
+          inp.addEventListener("input", () => {
+            activeExam.answers[q.id] = inp.value;
+            renderQuestionNavGrid();
+          });
+          area.appendChild(inp);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.placeholder = "Tulis jawaban uraian Anda di sini...";
+          ta.value = savedAns;
+          ta.addEventListener("input", () => {
+            activeExam.answers[q.id] = ta.value;
+            renderQuestionNavGrid();
+          });
+          area.appendChild(ta);
+        }
+
+        document.getElementById("btnPrevSoal").disabled = idx === 0;
+        document.getElementById("btnNextSoal").disabled = idx === total - 1;
+        renderQuestionNavGrid();
+      }
+
+      function renderQuestionNavGrid() {
+        if (!activeExam) return;
+        const grid = document.getElementById("questionNavGrid");
+        grid.innerHTML = "";
+        activeExam.questions.forEach((q, idx) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          const ans = (activeExam.answers[q.id] || "").trim();
+          btn.className = "num-btn" + (ans ? " answered" : "") + (idx === activeExam.currentIndex ? " current" : "");
+          btn.textContent = String(idx + 1);
+          btn.addEventListener("click", () => {
+            activeExam.currentIndex = idx;
+            renderCurrentQuestion();
+          });
+          grid.appendChild(btn);
+        });
+      }
+
+      document.getElementById("btnPrevSoal").addEventListener("click", () => {
+        if (activeExam && activeExam.currentIndex > 0) {
+          activeExam.currentIndex -= 1;
+          renderCurrentQuestion();
+        }
+      });
+
+      document.getElementById("btnNextSoal").addEventListener("click", () => {
+        if (activeExam && activeExam.currentIndex < activeExam.questions.length - 1) {
+          activeExam.currentIndex += 1;
+          renderCurrentQuestion();
+        }
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && activeExam) {
+          activeExam.violations += 1;
+          document.getElementById("examViolationInfo").textContent = `${activeExam.violations} / ${appData.maxTab}`;
+          if (activeExam.violations >= appData.maxTab) {
+            finishExam("Terkunci (3x Pindah Tab)");
+          } else {
+            toast(`Peringatan! Jangan keluar dari halaman ujian (${activeExam.violations}/${appData.maxTab}).`);
+          }
+        }
+      });
+
+      document.getElementById("btnFinishExam").addEventListener("click", () => {
+        if (confirm("Kumpulkan jawaban ujian sekarang?")) {
+          finishExam("Selesai Normal");
+        }
+      });
+
+      async function finishExam(statusLabel) {
+        if (!activeExam) return;
+        clearInterval(timerInterval);
+
+        let totalBobot = 0;
+        let skorDiperoleh = 0;
+        const rincian = [];
+
+        activeExam.questions.forEach((q, i) => {
+          const bobot = Number(q.bobot) || 10;
+          totalBobot += bobot;
+          const ans = (activeExam.answers[q.id] || "").trim();
+          if (q.jenis === "PG") {
+            if (ans.toUpperCase() === (q.kunci || "").toUpperCase()) skorDiperoleh += bobot;
+          } else if (q.jenis === "ISIAN" && q.kunci) {
+            if (ans.toLowerCase() === q.kunci.trim().toLowerCase()) skorDiperoleh += bobot;
+          }
+          rincian.push(`No.${i + 1}: ${ans || "(Kosong)"}`);
+        });
+
+        const nilaiAkhir = totalBobot > 0 ? Math.round((skorDiperoleh / totalBobot) * 100) : 0;
+        const waktuSelesai = new Date().toLocaleString("id-ID");
+
+        const payload = {
+          id: "rek-" + Date.now(),
+          waktu: waktuSelesai,
+          nama: activeExam.nama,
+          nisn: activeExam.nisn,
+          kelas: activeExam.paket.kelas,
+          hari: activeExam.paket.hari,
+          mapel: activeExam.paket.mapel,
+          nilai: `${nilaiAkhir} (${skorDiperoleh}/${totalBobot})`,
+          pelanggaran: `${activeExam.violations}x (${statusLabel})`,
+          detail: rincian.join(" | ")
+        };
+
+        lastSubmissionPayload = payload;
+        appData.rekapList.unshift(payload);
+        saveLocal();
+
+        const sent = await sendExamResultToSheets(payload);
+
+        document.getElementById("doneNama").textContent = payload.nama;
+        document.getElementById("doneNisn").textContent = payload.nisn;
+        document.getElementById("doneKelasHari").textContent = `${payload.kelas} / ${payload.hari}`;
+        document.getElementById("doneMapel").textContent = payload.mapel;
+        document.getElementById("doneWaktu").textContent = payload.waktu;
+        document.getElementById("doneSendStatus").textContent = appData.gasUrl
+          ? (sent ? "Terkirim ke Google Sheets Pusat" : "Tersimpan Lokal (Klik Kirim Ulang jika jaringan lambat)")
+          : "Tersimpan di Perangkat Ini (URL Google Sheets belum diatur Admin)";
+
+        activeExam = null;
+        showView("viewStudentDone");
+      }
+
+      document.getElementById("btnResendCenter").addEventListener("click", async () => {
+        if (!lastSubmissionPayload) return;
+        const ok = await sendExamResultToSheets(lastSubmissionPayload);
+        toast(ok ? "Data berhasil dikirim ulang ke Google Sheets." : "Pastikan URL Google Sheets sudah terhubung.");
+      });
+
+      document.getElementById("btnBackHome").addEventListener("click", () => {
+        document.getElementById("studentStartForm").reset();
+        updateStudentPaketDropdown();
+        showView("viewStudentLogin");
+      });
+
+      // ==================== PANEL ADMIN: PAKET & SOAL ====================
+      document.getElementById("btnRandomToken").addEventListener("click", () => {
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        let res = "";
+        for (let i = 0; i < 6; i++) res += chars[Math.floor(Math.random() * chars.length)];
+        document.getElementById("admToken").value = res;
+      });
+
+      document.getElementById("formAddPaket").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const kelas = document.getElementById("admKelas").value;
+        const hari = document.getElementById("admHari").value;
+        const mapel = document.getElementById("admMapel").value.trim();
+        const durasi = Number(document.getElementById("admDurasi").value) || 90;
+        const token = document.getElementById("admToken").value.trim().toUpperCase();
+
+        appData.paketList.push({
+          id: "pkt-" + Date.now(),
+          kelas,
+          hari,
+          mapel,
+          durasi,
+          token
+        });
+
+        saveLocal();
+        await pushBankSoalToSheets();
+        document.getElementById("admMapel").value = "";
+        document.getElementById("admToken").value = "";
+        renderAllAdmin();
+        updateStudentPaketDropdown();
+        toast("Paket ujian berhasil disimpan.");
+      });
+
+      function renderPaketTable() {
+        const tbody = document.getElementById("tbodyPaket");
+        tbody.innerHTML = "";
+        if (appData.paketList.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7">Belum ada paket ujian.</td></tr>';
+          return;
+        }
+        appData.paketList.forEach((p) => {
+          const jmlSoal = appData.soalList.filter((s) => s.paketId === p.id).length;
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${p.kelas}</td>
+            <td>${p.hari}</td>
+            <td>${p.mapel}</td>
+            <td>${p.durasi} mnt</td>
+            <td><strong>${p.token}</strong></td>
+            <td>${jmlSoal} soal</td>
+            <td><button type="button" class="btn btn-danger btn-sm" data-del-pkt="${p.id}">Hapus</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll("[data-del-pkt]").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const id = btn.dataset.delPkt;
+            appData.paketList = appData.paketList.filter((p) => p.id !== id);
+            appData.soalList = appData.soalList.filter((s) => s.paketId !== id);
+            saveLocal();
+            await pushBankSoalToSheets();
+            renderAllAdmin();
+            updateStudentPaketDropdown();
+            toast("Paket ujian dihapus.");
+          });
+        });
+      }
+
+      // ==================== IMPOR SOAL DARI MICROSOFT WORD (.DOCX) ====================
+      document.getElementById("btnDownloadWordTemplate").addEventListener("click", () => {
+        const contoh = [
+          "1. Hasil dari 12 x 5 adalah...",
+          "A. 50",
+          "B. 55",
+          "C. 60",
+          "D. 65",
+          "KUNCI: C",
+          "",
+          "2. Ibu kota Provinsi Aceh adalah...",
+          "A. Lhokseumawe",
+          "B. Banda Aceh",
+          "C. Meulaboh",
+          "D. Langsa",
+          "KUNCI: B",
+          "",
+          "3. Planet terbesar dalam tata surya adalah...",
+          "KUNCI: Jupiter",
+          "",
+          "4. Jelaskan secara singkat manfaat menjaga kebersihan lingkungan sekolah!"
+        ].join("\n");
+        const blob = new Blob([contoh], { type: "text/plain;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "contoh-format-soal-word.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      function parseWordRawTextToQuestions(rawText, paketId) {
+        const lines = rawText
+          .split(/\r?\n/)
+          .map((l) => l.trim())
+          .filter((l) => l.length > 0);
+
+        const parsedQuestions = [];
+        let current = null;
+
+        function finalizeCurrent() {
+          if (!current || !current.pertanyaan) return;
+          const hasPG = current.opsiA || current.opsiB || current.opsiC || current.opsiD;
+          if (hasPG) {
+            current.jenis = "PG";
+            current.kunci = (current.kunci || "A").toUpperCase();
+            if (!["A", "B", "C", "D"].includes(current.kunci)) current.kunci = "A";
+          } else if (current.kunci) {
+            current.jenis = "ISIAN";
+          } else {
+            current.jenis = "URAIAN";
+            current.kunci = "Manual";
+          }
+          parsedQuestions.push(current);
+        }
+
+        for (const line of lines) {
+          // Deteksi baris opsi A., B., C., D. (atau A), B), C), D))
+          const optMatch = line.match(/^([A-Da-d])[\.\)]\s*(.+)$/);
+          if (optMatch && current) {
+            const letter = optMatch[1].toUpperCase();
+            current["opsi" + letter] = optMatch[2].trim();
+            continue;
+          }
+
+          // Deteksi baris KUNCI: ... atau JAWABAN: ...
+          const keyMatch = line.match(/^(?:KUNCI|JAWABAN|KUNCI\s*JAWABAN)\s*[:=\-]\s*(.+)$/i);
+          if (keyMatch && current) {
+            current.kunci = keyMatch[1].trim();
+            continue;
+          }
+
+          // Deteksi nomor soal baru (misal "1. ..." atau "1) ..." atau "SOAL: ...")
+          const numMatch = line.match(/^(?:SOAL\s*[:\-]\s*|\d+[\.\)]\s*)(.+)$/i);
+          if (numMatch) {
+            finalizeCurrent();
+            current = {
+              id: "soal-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+              paketId,
+              jenis: "PG",
+              bobot: 10,
+              pertanyaan: numMatch[1].trim(),
+              opsiA: "",
+              opsiB: "",
+              opsiC: "",
+              opsiD: "",
+              kunci: ""
+            };
+            continue;
+          }
+
+          // Jika baris lanjutan pertanyaan atau awal soal tanpa nomor
+          if (!current) {
+            current = {
+              id: "soal-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+              paketId,
+              jenis: "PG",
+              bobot: 10,
+              pertanyaan: line,
+              opsiA: "",
+              opsiB: "",
+              opsiC: "",
+              opsiD: "",
+              kunci: ""
+            };
+          } else if (!current.opsiA && !current.kunci) {
+            current.pertanyaan += " " + line;
+          } else {
+            finalizeCurrent();
+            current = {
+              id: "soal-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+              paketId,
+              jenis: "PG",
+              bobot: 10,
+              pertanyaan: line,
+              opsiA: "",
+              opsiB: "",
+              opsiC: "",
+              opsiD: "",
+              kunci: ""
+            };
+          }
+        }
+        finalizeCurrent();
+        return parsedQuestions;
+      }
+
+      document.getElementById("btnImportWord").addEventListener("click", async () => {
+        const paketId = document.getElementById("selectPaketForSoal").value;
+        if (!paketId) {
+          toast("Pilih atau buat paket ujian terlebih dahulu.");
+          return;
+        }
+        const fileInput = document.getElementById("inputWordFile");
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) {
+          toast("Pilih file dokumen Word (.docx) dari laptop terlebih dahulu.");
+          return;
+        }
+        if (typeof mammoth === "undefined") {
+          toast("Pustaka pembaca Word sedang dimuat, periksa koneksi internet lalu coba lagi.");
+          return;
+        }
+
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          const imported = parseWordRawTextToQuestions(result.value || "", paketId);
+
+          if (imported.length === 0) {
+            toast("Tidak ada soal yang terbaca dari file Word. Periksa format penulisan soal.");
+            return;
+          }
+
+          appData.soalList.push(...imported);
+          saveLocal();
+          await pushBankSoalToSheets();
+          fileInput.value = "";
+          renderPaketTable();
+          renderSoalTable();
+          toast(`Berhasil mengimpor ${imported.length} soal dari dokumen Word!`);
+        } catch (err) {
+          toast("Gagal membaca file Word (.docx). Pastikan file berformat .docx yang valid.");
+        }
+      });
+
+      // ==================== TAMBAH / EDIT SOAL MANUAL ====================
+      function populateSelectPaketSoal() {
+        const sel = document.getElementById("selectPaketForSoal");
+        const prev = sel.value;
+        sel.innerHTML = "";
+        appData.paketList.forEach((p) => {
+          const opt = document.createElement("option");
+          opt.value = p.id;
+          opt.textContent = `${p.kelas} — ${p.hari} — ${p.mapel}`;
+          sel.appendChild(opt);
+        });
+        if (prev && appData.paketList.some((p) => p.id === prev)) sel.value = prev;
+        renderSoalTable();
+      }
+
+      document.getElementById("selectPaketForSoal").addEventListener("change", () => {
+        resetFormSoal();
+        renderSoalTable();
+      });
+
+      document.getElementById("soalJenis").addEventListener("change", () => {
+        const j = document.getElementById("soalJenis").value;
+        document.getElementById("boxOpsiPG").classList.toggle("hidden", j !== "PG");
+        document.getElementById("boxOpsiIsian").classList.toggle("hidden", j !== "ISIAN");
+      });
+
+      function resetFormSoal() {
+        document.getElementById("editingSoalId").value = "";
+        document.getElementById("formSaveSoal").reset();
+        document.getElementById("boxOpsiPG").classList.remove("hidden");
+        document.getElementById("boxOpsiIsian").classList.add("hidden");
+        document.getElementById("btnSubmitSoal").textContent = "Simpan Soal Baru";
+        document.getElementById("btnCancelEditSoal").classList.add("hidden");
+      }
+
+      document.getElementById("btnCancelEditSoal").addEventListener("click", resetFormSoal);
+
+      document.getElementById("formSaveSoal").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const paketId = document.getElementById("selectPaketForSoal").value;
+        if (!paketId) {
+          toast("Buat paket ujian terlebih dahulu di Tab 1.");
+          return;
+        }
+
+        const editId = document.getElementById("editingSoalId").value;
+        const jenis = document.getElementById("soalJenis").value;
+        const bobot = Number(document.getElementById("soalBobot").value) || 10;
+        const pertanyaan = document.getElementById("soalTeks").value.trim();
+
+        const objSoal = {
+          id: editId || "soal-" + Date.now(),
+          paketId,
+          jenis,
+          bobot,
+          pertanyaan,
+          opsiA: jenis === "PG" ? document.getElementById("soalOptA").value.trim() : "",
+          opsiB: jenis === "PG" ? document.getElementById("soalOptB").value.trim() : "",
+          opsiC: jenis === "PG" ? document.getElementById("soalOptC").value.trim() : "",
+          opsiD: jenis === "PG" ? document.getElementById("soalOptD").value.trim() : "",
+          kunci:
+            jenis === "PG"
+              ? document.getElementById("soalKunciPG").value
+              : jenis === "ISIAN"
+              ? document.getElementById("soalKunciIsian").value.trim()
+              : "Manual"
+        };
+
+        if (editId) {
+          const idx = appData.soalList.findIndex((s) => s.id === editId);
+          if (idx !== -1) appData.soalList[idx] = objSoal;
+          toast("Perubahan soal berhasil disimpan.");
+        } else {
+          appData.soalList.push(objSoal);
+          toast("Soal baru berhasil ditambahkan.");
+        }
+
+        saveLocal();
+        await pushBankSoalToSheets();
+        resetFormSoal();
+        renderPaketTable();
+        renderSoalTable();
+      });
+
+      function renderSoalTable() {
+        const paketId = document.getElementById("selectPaketForSoal").value;
+        const tbody = document.getElementById("tbodySoal");
+        tbody.innerHTML = "";
+
+        const items = appData.soalList.filter((s) => s.paketId === paketId);
+        if (items.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6">Belum ada soal pada paket ini.</td></tr>';
+          return;
+        }
+
+        items.forEach((s, idx) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td>${s.jenis}</td>
+            <td>${s.pertanyaan}</td>
+            <td><strong>${s.kunci || "-"}</strong></td>
+            <td>${s.bobot}</td>
+            <td>
+              <button type="button" class="btn btn-secondary btn-sm" data-edit-soal="${s.id}">Edit</button>
+              <button type="button" class="btn btn-danger btn-sm" data-del-soal="${s.id}">Hapus</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll("[data-edit-soal]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const s = appData.soalList.find((x) => x.id === btn.dataset.editSoal);
+            if (!s) return;
+            document.getElementById("editingSoalId").value = s.id;
+            document.getElementById("soalJenis").value = s.jenis;
+            document.getElementById("soalBobot").value = s.bobot;
+            document.getElementById("soalTeks").value = s.pertanyaan;
+            document.getElementById("soalOptA").value = s.opsiA || "";
+            document.getElementById("soalOptB").value = s.opsiB || "";
+            document.getElementById("soalOptC").value = s.opsiC || "";
+            document.getElementById("soalOptD").value = s.opsiD || "";
+            if (s.jenis === "PG") document.getElementById("soalKunciPG").value = s.kunci || "A";
+            if (s.jenis === "ISIAN") document.getElementById("soalKunciIsian").value = s.kunci || "";
+
+            document.getElementById("boxOpsiPG").classList.toggle("hidden", s.jenis !== "PG");
+            document.getElementById("boxOpsiIsian").classList.toggle("hidden", s.jenis !== "ISIAN");
+            document.getElementById("btnSubmitSoal").textContent = "Simpan Perubahan Soal";
+            document.getElementById("btnCancelEditSoal").classList.remove("hidden");
+            document.getElementById("soalTeks").focus();
+          });
+        });
+
+        tbody.querySelectorAll("[data-del-soal]").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            const id = btn.dataset.delSoal;
+            appData.soalList = appData.soalList.filter((s) => s.id !== id);
+            saveLocal();
+            await pushBankSoalToSheets();
+            renderPaketTable();
+            renderSoalTable();
+            toast("Soal berhasil dihapus.");
+          });
+        });
+      }
+
+      // ==================== REKAP NILAI ====================
+      function renderRekapTable() {
+        const kelas = document.getElementById("filterRekapKelas").value;
+        const mapel = document.getElementById("filterRekapMapel").value.trim().toLowerCase();
+        const nama = document.getElementById("filterRekapNama").value.trim().toLowerCase();
+
+        const filtered = appData.rekapList.filter((r) => {
+          const okKelas = kelas === "SEMUA" || r.kelas === kelas;
+          const okMapel = !mapel || (r.mapel || "").toLowerCase().includes(mapel);
+          const okNama =
+            !nama ||
+            (r.nama || "").toLowerCase().includes(nama) ||
+            (r.nisn || "").toLowerCase().includes(nama);
+          return okKelas && okMapel && okNama;
+        });
+
+        const tbody = document.getElementById("tbodyRekap");
+        tbody.innerHTML = "";
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9">Belum ada data hasil ujian siswa.</td></tr>';
+          return;
+        }
+
+        filtered.forEach((r, idx) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${r.waktu || "-"}</td>
+            <td>${r.nama}</td>
+            <td>${r.nisn}</td>
+            <td>${r.kelas}</td>
+            <td>${r.hari}</td>
+            <td>${r.mapel}</td>
+            <td><strong>${r.nilai}</strong></td>
+            <td>${r.pelanggaran || "0x"}</td>
+            <td><button type="button" class="btn btn-secondary btn-sm" data-view-det="${idx}">Lihat</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        tbody.querySelectorAll("[data-view-det]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const item = filtered[Number(btn.dataset.viewDet)];
+            if (!item) return;
+            document.getElementById("detailRekapContent").innerHTML = `
+              <p><strong>Nama:</strong> ${item.nama} (${item.nisn})</p>
+              <p><strong>Ujian:</strong> ${item.mapel} — ${item.kelas} (${item.hari})</p>
+              <p><strong>Nilai:</strong> ${item.nilai}</p>
+              <p><strong>Rincian Jawaban:</strong><br/>${item.detail || "-"}</p>
+            `;
+            document.getElementById("modalDetailRekap").classList.add("open");
+          });
+        });
+      }
+
+      document.getElementById("btnCloseDetailModal").addEventListener("click", () => {
+        document.getElementById("modalDetailRekap").classList.remove("open");
+      });
+
+      ["filterRekapKelas", "filterRekapMapel", "filterRekapNama"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", renderRekapTable);
+        document.getElementById(id).addEventListener("change", renderRekapTable);
+      });
+
+      document.getElementById("btnPullRekap").addEventListener("click", () => pullAllFromSheets(false));
+      document.getElementById("btnSyncAllNow").addEventListener("click", () => pullAllFromSheets(false));
+
+      document.getElementById("btnExportCsv").addEventListener("click", () => {
+        const headers = ["Waktu", "Nama", "NISN", "Kelas", "Hari", "Mapel", "Nilai", "Pelanggaran", "Detail"];
+        const lines = [
+          headers.join(","),
+          ...appData.rekapList.map((r) =>
+            [r.waktu, r.nama, r.nisn, r.kelas, r.hari, r.mapel, r.nilai, r.pelanggaran, r.detail]
+              .map((v) => `"${String(v || "").replace(/"/g, '""')}"`)
+              .join(",")
+          )
+        ];
+        const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "rekap-nilai-siswa.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      // ==================== LINK SISWA & PENGATURAN ====================
+      function renderLinkAndSettings() {
+        document.getElementById("inputGasUrl").value = appData.gasUrl || "";
+        document.getElementById("inputMaxTab").value = String(appData.maxTab || 3);
+
+        const baseUrl = window.location.origin + window.location.pathname;
+        const fullLink = appData.gasUrl ? `${baseUrl}?gas=${encodeURIComponent(appData.gasUrl)}` : baseUrl;
+        document.getElementById("generatedStudentLink").value = fullLink;
+      }
+
+      document.getElementById("btnCopyStudentLink").addEventListener("click", () => {
+        const inp = document.getElementById("generatedStudentLink");
+        inp.select();
+        if (navigator.clipboard) navigator.clipboard.writeText(inp.value).catch(() => {});
+        toast("Link ujian siswa berhasil disalin!");
+      });
+
+      document.getElementById("formSaveSettings").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        appData.gasUrl = document.getElementById("inputGasUrl").value.trim();
+        appData.maxTab = Math.max(1, Number(document.getElementById("inputMaxTab").value) || 3);
+        saveLocal();
+        updateSyncBadge();
+        renderLinkAndSettings();
+        await pushBankSoalToSheets();
+        toast("Pengaturan disimpan & disinkronkan ke Google Sheets.");
+      });
+
+      document.getElementById("btnPushBankSoal").addEventListener("click", async () => {
+        if (!appData.gasUrl) {
+          toast("Masukkan URL Google Apps Script terlebih dahulu.");
+          return;
+        }
+        await pushBankSoalToSheets();
+        toast("Paket & bank soal dikirim ke Google Sheets.");
+      });
+
+      document.getElementById("formChangePass").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const oldP = document.getElementById("passOld").value;
+        const newP = document.getElementById("passNew").value;
+        if (oldP !== appData.adminPassword) {
+          toast("Password saat ini salah.");
+          return;
+        }
+        appData.adminPassword = newP;
+        saveLocal();
+        document.getElementById("formChangePass").reset();
+        toast("Password admin berhasil diubah.");
+      });
+
+      function renderAllAdmin() {
+        renderPaketTable();
+        populateSelectPaketSoal();
+        renderRekapTable();
+        renderLinkAndSettings();
+      }
+
+      // Inisialisasi Awal
+      loadLocal();
+      updateSyncBadge();
+      updateStudentPaketDropdown();
+      if (appData.gasUrl) {
+        pullAllFromSheets(true);
+      }
+    })();
+  </script>
+</body>
+</html>
