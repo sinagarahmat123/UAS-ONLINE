@@ -345,13 +345,26 @@
     <section id="viewStudentDone" class="hidden">
       <div class="card">
         <h2 style="color: #15803d;">&#10004; Ujian Telah Selesai Dikerjakan</h2>
-        <p class="card-desc">Jawaban Anda telah tercatat. Sesuai kebijakan ujian, nilai/skor tidak ditampilkan di layar siswa.</p>
+        <p class="card-desc">Jawaban Anda telah tercatat. Berikut ringkasan poin dan hasil akhir ujian Anda.</p>
+
+        <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 16px; margin-bottom: 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+          <div>
+            <div style="font-size: 12px; font-weight: 600; color: #166534;">POIN DIPEROLEH</div>
+            <div style="font-size: 26px; font-weight: 800; color: #15803d;" id="donePoinDisplay">0 / 0 Poin</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 12px; font-weight: 600; color: #1e40af;">NILAI AKHIR</div>
+            <div style="font-size: 26px; font-weight: 800; color: #1d4ed8;" id="doneNilaiDisplay">0</div>
+          </div>
+        </div>
 
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; font-size: 13px; line-height: 1.8; margin-bottom: 14px;">
           <div><strong>Nama Peserta:</strong> <span id="doneNama">-</span></div>
           <div><strong>NISN:</strong> <span id="doneNisn">-</span></div>
           <div><strong>Kelas / Hari:</strong> <span id="doneKelasHari">-</span></div>
           <div><strong>Mata Pelajaran:</strong> <span id="doneMapel">-</span></div>
+          <div><strong>Perolehan Poin:</strong> <span id="donePoinRinci">-</span></div>
+          <div><strong>Nilai Akhir:</strong> <span id="doneNilaiRinci">-</span></div>
           <div><strong>Status Pengiriman Pusat:</strong> <span id="doneSendStatus">-</span></div>
           <div><strong>Waktu Selesai:</strong> <span id="doneWaktu">-</span></div>
         </div>
@@ -1241,6 +1254,13 @@
 
         const sent = await sendExamResultToSheets(payload);
 
+        const poinLabel = `${skorDiperoleh} / ${totalBobot} Poin`;
+        const nilaiLabel = `${nilaiAkhir} / 100`;
+
+        document.getElementById("donePoinDisplay").textContent = poinLabel;
+        document.getElementById("doneNilaiDisplay").textContent = String(nilaiAkhir);
+        document.getElementById("donePoinRinci").textContent = poinLabel;
+        document.getElementById("doneNilaiRinci").textContent = nilaiLabel;
         document.getElementById("doneNama").textContent = payload.nama;
         document.getElementById("doneNisn").textContent = payload.nisn;
         document.getElementById("doneKelasHari").textContent = `${payload.kelas} / ${payload.hari}`;
