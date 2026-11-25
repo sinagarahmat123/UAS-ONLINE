@@ -109,8 +109,7 @@
               <span class="text-slate-600">Jumlah Soal:</span>
               <strong id="infoJumlahSoalPaket" class="text-blue-900 ml-1">-</strong>
             </div>
-            <div class="flex items-center gap-2">
-              <span id="badgeAcakPgSiswa" class="hidden px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800">Acak PG Aktif</span>
+            <div>
               <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Aktif</span>
             </div>
           </div>
@@ -143,7 +142,6 @@
           <div class="flex flex-wrap items-center gap-2 text-xs font-semibold text-blue-800 mb-1">
             <span id="ujianBadgeKelas" class="bg-blue-100 px-2.5 py-0.5 rounded">Kelas</span>
             <span id="ujianBadgeHari" class="bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded">Hari</span>
-            <span id="ujianBadgeAcakPg" class="hidden bg-indigo-100 text-indigo-800 px-2.5 py-0.5 rounded">Soal PG Diacak</span>
             <span class="bg-red-100 text-red-700 px-2.5 py-0.5 rounded">Anti-Nyontek Aktif</span>
           </div>
           <h2 id="ujianJudulMapel" class="text-lg font-bold text-slate-900">Mata Pelajaran</h2>
@@ -298,9 +296,14 @@
               <h3 class="font-bold text-slate-900">Tambah Paket Soal Ujian per Kelas & Hari</h3>
               <p class="text-xs text-slate-500">Pisahkan mata pelajaran berdasarkan hari ujian agar daftar pilihan siswa tidak menumpuk.</p>
             </div>
-            <button onclick="acakSemuaToken()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg">
-              Acak Semua Token
-            </button>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="salinSemuaToken()" class="text-xs bg-blue-900 hover:bg-blue-800 text-white font-bold px-3 py-1.5 rounded-lg">
+                Salin Semua Token
+              </button>
+              <button onclick="acakSemuaToken()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg">
+                Acak Semua Token
+              </button>
+            </div>
           </div>
 
           <form onsubmit="simpanPaketBaru(event)" class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
@@ -331,11 +334,7 @@
                 <button type="button" onclick="document.getElementById('adminPaketToken').value = buatTokenAcak()" class="px-2.5 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg text-xs font-bold">Acak</button>
               </div>
             </div>
-            <div class="md:col-span-6 flex flex-wrap items-center justify-between gap-3 pt-1">
-              <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer select-none">
-                <input type="checkbox" id="adminPaketAcakPG" checked class="rounded border-slate-300 text-blue-900 focus:ring-blue-600" />
-                <span>Acak urutan soal khusus jenis <strong>Pilihan Ganda</strong> saat ujian berlangsung</span>
-              </label>
+            <div class="md:col-span-6 flex justify-end pt-1">
               <button type="submit" class="bg-blue-900 hover:bg-blue-800 text-white font-semibold text-sm px-5 py-2 rounded-lg">
                 + Simpan Paket
               </button>
@@ -353,7 +352,6 @@
                 <th class="py-2.5 px-3">Mata Pelajaran</th>
                 <th class="py-2.5 px-3">Durasi</th>
                 <th class="py-2.5 px-3">Kode Token</th>
-                <th class="py-2.5 px-3">Acak PG</th>
                 <th class="py-2.5 px-3">Jumlah Soal</th>
                 <th class="py-2.5 px-3">Status</th>
                 <th class="py-2.5 px-3 text-right">Aksi</th>
@@ -381,7 +379,7 @@
           <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
             <div class="text-xs text-blue-950 max-w-2xl">
               <p class="font-bold text-sm text-blue-900">Impor Soal dari File Teks (.txt)</p>
-              <p class="mt-0.5">Format per blok soal dipisahkan baris kosong: <code>SOAL: ...</code>, <code>TIPE: PG | ISIAN | URAIAN</code>, dan <code>A: ...</code> s.d <code>D: ...</code> (untuk PG). <strong>Kunci jawaban tidak perlu ditulis di dokumen</strong>—atur langsung lewat tombol <strong>Edit / Atur Kunci</strong> setelah soal berhasil diimpor.</p>
+              <p class="mt-0.5">Format per blok soal dipisahkan baris kosong: <code>SOAL: ...</code>, <code>TIPE: PG | ISIAN | URAIAN</code>, dan <code>A: ...</code> s.d <code>D: ...</code> (opsional <code>KUNCI: A</code>). Setelah diimpor, kunci jawaban dapat diklik langsung 1x pada daftar soal atau diisi sekaligus secara massal.</p>
             </div>
             <div class="flex items-center gap-2">
               <button type="button" onclick="unduhContohFormatTeks()" class="px-3 py-2 rounded-lg bg-white border border-blue-300 text-blue-900 text-xs font-semibold hover:bg-blue-100">
@@ -466,13 +464,28 @@
           </form>
         </div>
 
-        <div class="bg-white rounded-xl shadow border border-slate-200 p-5">
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <h3 class="font-bold text-slate-900">Daftar Soal pada Paket Terpilih</h3>
+        <div class="bg-white rounded-xl shadow border border-slate-200 p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="font-bold text-slate-900">Daftar Soal & Atur Kunci Jawaban Cepat</h3>
             <span id="badgeBelumAdaKunci" class="hidden text-xs font-semibold px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
               Ada soal PG yang belum diatur kunci jawabannya
             </span>
           </div>
+
+          <!-- Input Kunci Massal -->
+          <div id="boxInputKunciMassal" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
+            <div class="text-xs text-emerald-950">
+              <p class="font-bold text-emerald-900">Input Kunci Jawaban Massal (Pilihan Ganda)</p>
+              <p class="mt-0.5">Ketik urutan kunci sesuai nomor soal PG (contoh: <code>C A B D</code> atau <code>CABD</code>), lalu klik Terapkan.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 flex-1 sm:flex-initial justify-end">
+              <input type="text" id="inputKunciMassal" placeholder="Contoh: A B C D A..." class="px-3 py-1.5 rounded-lg border border-emerald-300 text-sm uppercase font-mono tracking-wider bg-white min-w-[210px]" />
+              <button type="button" onclick="terapkanKunciMassal()" class="px-3.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold">
+                Terapkan Kunci
+              </button>
+            </div>
+          </div>
+
           <div id="wadahDaftarSoalAdmin" class="space-y-3 text-sm text-slate-600">
             Silakan pilih paket ujian di atas untuk melihat daftar soal.
           </div>
@@ -732,13 +745,6 @@
           </div>
         </div>
 
-        <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3">
-          <label class="inline-flex items-center gap-2 text-xs font-semibold text-indigo-950 cursor-pointer select-none">
-            <input type="checkbox" id="editPaketAcakPG" class="rounded border-indigo-300 text-indigo-900 focus:ring-indigo-600" />
-            <span>Acak urutan soal khusus jenis <strong>Pilihan Ganda</strong> saat ujian dimulai</span>
-          </label>
-        </div>
-
         <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
           <button type="button" onclick="tutupModalEditPaket()" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold">Batal</button>
           <button type="submit" class="px-5 py-2 rounded-lg bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold">Simpan Perubahan</button>
@@ -956,7 +962,7 @@
         if (window.appData) {
           if (paketCloud.length > 0) {
             const petaPaket = new Map();
-            paketCloud.forEach((p) => petaPaket.set(p.id, { acakPG: true, ...p }));
+            paketCloud.forEach((p) => petaPaket.set(p.id, p));
             window.appData.paketList = Array.from(petaPaket.values());
           }
 
@@ -1021,8 +1027,7 @@
           hari: 'Senin',
           mapel: 'TULISAN ARAB MELAYU',
           durasi: 60,
-          token: 'KKFPJ3',
-          acakPG: true
+          token: 'KKFPJ3'
         },
         {
           id: 'pkt-1795506158939',
@@ -1030,8 +1035,7 @@
           hari: 'Senin',
           mapel: 'TULISAN ARAB MELAYU',
           durasi: 60,
-          token: 'AC5CM8',
-          acakPG: true
+          token: 'AC5CM8'
         }
       ],
       soalList: [
@@ -1081,7 +1085,7 @@
       ...defaultData,
       ...rawStored,
       pengaturan: { ...defaultData.pengaturan, ...(rawStored.pengaturan || {}) },
-      paketList: Array.isArray(rawStored.paketList) ? rawStored.paketList.map(p => ({ acakPG: true, ...p })) : defaultData.paketList,
+      paketList: Array.isArray(rawStored.paketList) ? rawStored.paketList : defaultData.paketList,
       soalList: Array.isArray(rawStored.soalList) ? rawStored.soalList : defaultData.soalList,
       rekapList: Array.isArray(rawStored.rekapList) ? rawStored.rekapList : [],
       antreanKirim: Array.isArray(rawStored.antreanKirim) ? rawStored.antreanKirim : []
@@ -1202,9 +1206,6 @@
       const jmlSoal = appData.soalList.filter(s => s.paketId === paketId).length;
       document.getElementById('infoDurasiPaket').textContent = `${paket.durasi} Menit`;
       document.getElementById('infoJumlahSoalPaket').textContent = `${jmlSoal} Butir`;
-      const badgeAcak = document.getElementById('badgeAcakPgSiswa');
-      if (paket.acakPG) badgeAcak.classList.remove('hidden');
-      else badgeAcak.classList.add('hidden');
       box.classList.remove('hidden');
     }
 
@@ -1231,39 +1232,6 @@
       }
     };
 
-    // Mengacak khusus soal jenis Pilihan Ganda (PG) saja
-    function susunSoalUjian(soalAsliList, acakPG) {
-      const berNomorAsli = soalAsliList.map((s, idx) => ({
-        ...s,
-        nomorAsli: idx + 1
-      }));
-
-      if (!acakPG) {
-        return berNomorAsli;
-      }
-
-      const posisiPG = [];
-      const soalPG = [];
-      berNomorAsli.forEach((s, idx) => {
-        if (s.jenis === 'PG') {
-          posisiPG.push(idx);
-          soalPG.push(s);
-        }
-      });
-
-      for (let i = soalPG.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [soalPG[i], soalPG[j]] = [soalPG[j], soalPG[i]];
-      }
-
-      const hasil = [...berNomorAsli];
-      posisiPG.forEach((pos, idx) => {
-        hasil[pos] = soalPG[idx];
-      });
-
-      return hasil;
-    }
-
     async function mulaiUjian(e) {
       e.preventDefault();
       if (typeof window.muatDataDariFirestore === 'function') {
@@ -1285,13 +1253,11 @@
         return;
       }
 
-      const soalAsliPaket = appData.soalList.filter(s => s.paketId === paketId);
-      if (soalAsliPaket.length === 0) {
+      const soalPaket = appData.soalList.filter(s => s.paketId === paketId);
+      if (soalPaket.length === 0) {
         alert('Paket ujian ini belum memiliki butir soal. Hubungi pengawas/admin.');
         return;
       }
-
-      const soalPaket = susunSoalUjian(soalAsliPaket, Boolean(paket.acakPG));
 
       sesiUjian = {
         nama,
@@ -1319,12 +1285,7 @@
       document.getElementById('ujianNamaPeserta').textContent = nama;
       document.getElementById('ujianNisnPeserta').textContent = nisn;
 
-      const badgeAcakUjian = document.getElementById('ujianBadgeAcakPg');
-      if (paket.acakPG) badgeAcakUjian.classList.remove('hidden');
-      else badgeAcakUjian.classList.add('hidden');
-
       perbaruiTampilanPelanggaran();
-
       renderSoalAktif();
       renderNavigasiSoal();
       mulaiTimerUjian();
@@ -1534,9 +1495,7 @@
       const rincianLengkap = [];
 
       sesiUjian.soalPaket.forEach((soal, idx) => {
-        const nomorTampil = idx + 1;
-        const nomorRef = soal.nomorAsli || nomorTampil;
-        const labelNomor = nomorTampil === nomorRef ? `No.${nomorTampil}` : `No.${nomorTampil} (Bank No.${nomorRef})`;
+        const nomor = idx + 1;
         const jwb = (sesiUjian.jawaban[soal.id] || '').trim();
 
         if (soal.jenis === 'PG') {
@@ -1546,16 +1505,16 @@
           if (isBenar) benarPG++;
           else salahPG++;
 
-          rincianLengkap.push(`${labelNomor} [PG]: ${jwb || '-'} (${kunci ? (isBenar ? 'Benar' : 'Salah') : 'Kunci Belum Diatur'})`);
+          rincianLengkap.push(`No.${nomor} [PG]: ${jwb || '-'} (${kunci ? (isBenar ? 'Benar' : 'Salah') : 'Kunci Belum Diatur'})`);
         } else if (soal.jenis === 'URAIAN') {
           totalUraian++;
-          const teksEsai = `No.${nomorRef}: ${jwb || '(Kosong)'} [Masih Ditinjau]`;
+          const teksEsai = `No.${nomor}: ${jwb || '(Kosong)'} [Masih Ditinjau]`;
           daftarEsai.push(teksEsai);
-          rincianLengkap.push(`${labelNomor} [URAIAN - Masih Ditinjau]: ${jwb || '(Kosong)'}`);
+          rincianLengkap.push(`No.${nomor} [URAIAN - Masih Ditinjau]: ${jwb || '(Kosong)'}`);
         } else {
-          const teksEsai = `No.${nomorRef}: ${jwb || '(Kosong)'}`;
+          const teksEsai = `No.${nomor}: ${jwb || '(Kosong)'}`;
           daftarEsai.push(teksEsai);
-          rincianLengkap.push(`${labelNomor} [ISIAN]: ${jwb || '(Kosong)'}`);
+          rincianLengkap.push(`No.${nomor} [ISIAN]: ${jwb || '(Kosong)'}`);
         }
       });
 
@@ -1742,12 +1701,63 @@
     }
     window.segarkanSemuaDataAdmin = segarkanSemuaDataAdmin;
 
-    // --- Manajemen Paket ---
+    // --- Manajemen Paket & Salin Token ---
     function buatTokenAcak() {
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let res = '';
       for (let i = 0; i < 6; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
       return res;
+    }
+
+    function salinTeksKeClipboard(teks, btnEl = null, labelDefault = 'Salin') {
+      const selesaiSalin = () => {
+        if (btnEl) {
+          btnEl.textContent = 'Tersalin!';
+          btnEl.classList.add('bg-emerald-600', 'text-white', 'border-emerald-600');
+          setTimeout(() => {
+            btnEl.textContent = labelDefault;
+            btnEl.classList.remove('bg-emerald-600', 'text-white', 'border-emerald-600');
+          }, 1500);
+        } else {
+          alert('Berhasil disalin ke clipboard!');
+        }
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(teks).then(selesaiSalin).catch(() => {
+          fallbackSalinTeks(teks);
+          selesaiSalin();
+        });
+      } else {
+        fallbackSalinTeks(teks);
+        selesaiSalin();
+      }
+    }
+
+    function fallbackSalinTeks(teks) {
+      const ta = document.createElement('textarea');
+      ta.value = teks;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+
+    function salinTokenPaket(token, btnEl) {
+      salinTeksKeClipboard(token, btnEl, 'Salin');
+    }
+
+    function salinSemuaToken() {
+      if (appData.paketList.length === 0) {
+        alert('Belum ada paket ujian.');
+        return;
+      }
+      const daftarTeks = appData.paketList.map(p =>
+        `${p.kelas} | ${p.hari} - ${p.mapel} : ${p.token}`
+      ).join('\n');
+      salinTeksKeClipboard(`DAFTAR TOKEN UJIAN CBT\n=====================\n${daftarTeks}`);
     }
 
     function simpanPaketBaru(e) {
@@ -1758,8 +1768,7 @@
         hari: document.getElementById('adminPaketHari').value.trim(),
         mapel: document.getElementById('adminPaketMapel').value.trim().toUpperCase(),
         durasi: parseInt(document.getElementById('adminPaketDurasi').value, 10) || 60,
-        token: document.getElementById('adminPaketToken').value.trim().toUpperCase() || buatTokenAcak(),
-        acakPG: document.getElementById('adminPaketAcakPG').checked
+        token: document.getElementById('adminPaketToken').value.trim().toUpperCase() || buatTokenAcak()
       };
       appData.paketList.push(paket);
       simpanData();
@@ -1768,7 +1777,6 @@
       }
       e.target.reset();
       document.getElementById('adminPaketDurasi').value = 60;
-      document.getElementById('adminPaketAcakPG').checked = true;
       segarkanSemuaDataAdmin();
     }
 
@@ -1782,7 +1790,6 @@
       document.getElementById('editPaketMapel').value = paket.mapel;
       document.getElementById('editPaketDurasi').value = paket.durasi;
       document.getElementById('editPaketToken').value = paket.token;
-      document.getElementById('editPaketAcakPG').checked = Boolean(paket.acakPG);
 
       document.getElementById('modalEditPaket').classList.remove('hidden');
     }
@@ -1803,8 +1810,7 @@
         hari: document.getElementById('editPaketHari').value.trim(),
         mapel: document.getElementById('editPaketMapel').value.trim().toUpperCase(),
         durasi: parseInt(document.getElementById('editPaketDurasi').value, 10) || 60,
-        token: document.getElementById('editPaketToken').value.trim().toUpperCase() || buatTokenAcak(),
-        acakPG: document.getElementById('editPaketAcakPG').checked
+        token: document.getElementById('editPaketToken').value.trim().toUpperCase() || buatTokenAcak()
       };
 
       simpanData();
@@ -1813,14 +1819,6 @@
       }
       tutupModalEditPaket();
       segarkanSemuaDataAdmin();
-    }
-
-    function toggleAcakPgPaket(id) {
-      const paket = appData.paketList.find(p => p.id === id);
-      if (!paket) return;
-      paket.acakPG = !paket.acakPG;
-      simpanData();
-      renderTabelPaket();
     }
 
     function acakSemuaToken() {
@@ -1854,27 +1852,24 @@
       const tbody = document.getElementById('tabelDaftarPaket');
       tbody.innerHTML = '';
       if (appData.paketList.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="py-4 text-center text-slate-400">Belum ada paket ujian.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="py-4 text-center text-slate-400">Belum ada paket ujian.</td></tr>';
         return;
       }
       appData.paketList.forEach(p => {
         const jml = appData.soalList.filter(s => s.paketId === p.id).length;
-        const acakAktif = Boolean(p.acakPG);
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="py-2.5 px-3 font-medium">${escapeHtml(p.kelas)}</td>
           <td class="py-2.5 px-3">${escapeHtml(p.hari)}</td>
           <td class="py-2.5 px-3 font-bold text-blue-950">${escapeHtml(p.mapel)}</td>
           <td class="py-2.5 px-3">${p.durasi} Menit</td>
-          <td class="py-2.5 px-3"><span class="font-mono font-bold bg-amber-100 text-amber-950 px-2 py-0.5 rounded">${escapeHtml(p.token)}</span></td>
-          <td class="py-2.5 px-3">
-            <button type="button" onclick="toggleAcakPgPaket('${p.id}')" title="Klik untuk ubah status acak soal Pilihan Ganda" class="text-xs font-semibold px-2.5 py-0.5 rounded-full border transition ${
-              acakAktif
-                ? 'bg-indigo-100 text-indigo-900 border-indigo-200 hover:bg-indigo-200'
-                : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
-            }">
-              ${acakAktif ? 'Acak PG: Ya' : 'Acak PG: Tidak'}
-            </button>
+          <td class="py-2.5 px-3 whitespace-nowrap">
+            <div class="inline-flex items-center gap-1.5">
+              <span class="font-mono font-bold bg-amber-100 text-amber-950 px-2.5 py-0.5 rounded select-all">${escapeHtml(p.token)}</span>
+              <button type="button" onclick="salinTokenPaket('${escapeHtml(p.token)}', this)" title="Salin kode token" class="text-xs px-2 py-0.5 rounded border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-semibold transition">
+                Salin
+              </button>
+            </div>
           </td>
           <td class="py-2.5 px-3">${jml} Soal</td>
           <td class="py-2.5 px-3"><span class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full">Aktif</span></td>
@@ -1887,7 +1882,7 @@
       });
     }
 
-    // --- Bank Soal & Impor Teks (.txt) ---
+    // --- Bank Soal & Atur Kunci Jawaban Simpel ---
     function perbaruiDropdownPaketAdmin() {
       const sel = document.getElementById('selectPaketKelolaSoal');
       const valLama = sel.value;
@@ -1976,7 +1971,50 @@
       renderTabelPaket();
     }
 
-    // --- Edit Soal & Atur Kunci Jawaban ---
+    // Set kunci jawaban langsung 1 klik dari kartu soal
+    function aturKunciCepat(soalId, hurufKunci) {
+      const soal = appData.soalList.find(s => s.id === soalId);
+      if (!soal || soal.jenis !== 'PG') return;
+      soal.kunci = hurufKunci;
+      simpanData();
+      if (typeof window.simpanSoalKeFirestore === 'function') {
+        window.simpanSoalKeFirestore(soal);
+      }
+      renderDaftarSoalAdmin();
+    }
+
+    // Terapkan deretan kunci jawaban sekaligus (misal: "A B C D" atau "ABCD")
+    function terapkanKunciMassal() {
+      const paketId = document.getElementById('selectPaketKelolaSoal').value;
+      if (!paketId) return;
+
+      const raw = document.getElementById('inputKunciMassal').value.toUpperCase().replace(/[^ABCD]/g, '');
+      if (!raw) {
+        alert('Masukkan huruf kunci jawaban (A, B, C, atau D) terlebih dahulu.');
+        return;
+      }
+
+      const daftarPG = appData.soalList.filter(s => s.paketId === paketId && s.jenis === 'PG');
+      if (daftarPG.length === 0) {
+        alert('Tidak ada soal Pilihan Ganda pada paket ini.');
+        return;
+      }
+
+      const jumlahDiisi = Math.min(raw.length, daftarPG.length);
+      for (let i = 0; i < jumlahDiisi; i++) {
+        daftarPG[i].kunci = raw[i];
+        if (typeof window.simpanSoalKeFirestore === 'function') {
+          window.simpanSoalKeFirestore(daftarPG[i]);
+        }
+      }
+
+      simpanData();
+      document.getElementById('inputKunciMassal').value = '';
+      renderDaftarSoalAdmin();
+      alert(`Berhasil menerapkan ${jumlahDiisi} kunci jawaban pada soal Pilihan Ganda.`);
+    }
+
+    // --- Edit Soal ---
     function bukaModalEditSoal(id) {
       const soal = appData.soalList.find(s => s.id === id);
       if (!soal) return;
@@ -2084,9 +2122,11 @@
       const paketId = document.getElementById('selectPaketKelolaSoal').value;
       const wadah = document.getElementById('wadahDaftarSoalAdmin');
       const badgeKunci = document.getElementById('badgeBelumAdaKunci');
+      const boxMassal = document.getElementById('boxInputKunciMassal');
 
       if (!paketId) {
         badgeKunci.classList.add('hidden');
+        boxMassal.classList.add('hidden');
         wadah.innerHTML = '<p class="text-slate-400">Silakan pilih paket ujian di atas untuk melihat daftar soal.</p>';
         return;
       }
@@ -2094,9 +2134,14 @@
       const daftar = appData.soalList.filter(s => s.paketId === paketId);
       if (daftar.length === 0) {
         badgeKunci.classList.add('hidden');
+        boxMassal.classList.add('hidden');
         wadah.innerHTML = '<p class="text-slate-400">Belum ada soal pada paket ini.</p>';
         return;
       }
+
+      const adaPG = daftar.some(s => s.jenis === 'PG');
+      if (adaPG) boxMassal.classList.remove('hidden');
+      else boxMassal.classList.add('hidden');
 
       const jumlahTanpaKunci = daftar.filter(s => s.jenis === 'PG' && !s.kunci).length;
       if (jumlahTanpaKunci > 0) {
@@ -2113,18 +2158,31 @@
         div.className = `border rounded-xl p-4 space-y-2 ${belumAdaKunci ? 'border-amber-400 bg-amber-50/40' : 'border-slate-200 bg-slate-50'}`;
         let detailOpsi = '';
         if (s.jenis === 'PG') {
-          const teksKunci = s.kunci
-            ? `<span class="text-xs font-bold text-emerald-700">Kunci Jawaban: ${escapeHtml(s.kunci)}</span>`
-            : `<span class="text-xs font-bold text-amber-800 bg-amber-200/80 px-2 py-0.5 rounded">Kunci Jawaban: Belum Diatur (Klik Edit untuk mengisi)</span>`;
+          const tombolKunciCepat = ['A', 'B', 'C', 'D'].map(huruf => {
+            const aktif = (s.kunci || '').toUpperCase() === huruf;
+            return `<button type="button" onclick="aturKunciCepat('${s.id}', '${huruf}')" class="w-8 h-8 rounded-lg font-bold text-xs border transition ${
+              aktif
+                ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm'
+                : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50 hover:border-emerald-400'
+            }">${huruf}</button>`;
+          }).join('');
 
           detailOpsi = `
             <div class="grid grid-cols-1 md:grid-cols-2 gap-1 text-xs text-slate-700 pt-1">
-              <div>A. ${escapeHtml(s.opsiA)}</div>
-              <div>B. ${escapeHtml(s.opsiB)}</div>
-              <div>C. ${escapeHtml(s.opsiC)}</div>
-              <div>D. ${escapeHtml(s.opsiD)}</div>
+              <div class="${s.kunci === 'A' ? 'font-bold text-emerald-800' : ''}">A. ${escapeHtml(s.opsiA)}</div>
+              <div class="${s.kunci === 'B' ? 'font-bold text-emerald-800' : ''}">B. ${escapeHtml(s.opsiB)}</div>
+              <div class="${s.kunci === 'C' ? 'font-bold text-emerald-800' : ''}">C. ${escapeHtml(s.opsiC)}</div>
+              <div class="${s.kunci === 'D' ? 'font-bold text-emerald-800' : ''}">D. ${escapeHtml(s.opsiD)}</div>
             </div>
-            <div class="pt-1">${teksKunci}</div>
+            <div class="pt-2 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-slate-700">Pilih Kunci Jawaban:</span>
+                <div class="inline-flex gap-1.5">${tombolKunciCepat}</div>
+              </div>
+              <span class="text-xs font-bold ${s.kunci ? 'text-emerald-700' : 'text-amber-800'}">
+                ${s.kunci ? `Kunci Aktif: ${escapeHtml(s.kunci)}` : 'Belum dipilih'}
+              </span>
+            </div>
           `;
         } else {
           detailOpsi = `<div class="text-xs text-blue-800 font-medium">Jawaban akan direkap otomatis ke kolom <strong>Jawaban Esai</strong> dengan nomor soal (No.${idx + 1}).</div>`;
@@ -2134,10 +2192,10 @@
           <div class="flex flex-wrap items-center justify-between gap-2">
             <span class="font-bold text-blue-950">No. ${idx + 1} <span class="ml-2 text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800">${s.jenis}</span></span>
             <div class="flex items-center gap-3">
-              <button type="button" onclick="bukaModalEditSoal('${s.id}')" class="text-xs px-2.5 py-1 rounded bg-blue-900 hover:bg-blue-800 text-white font-semibold">
-                ${belumAdaKunci ? 'Edit / Atur Kunci' : 'Edit Soal'}
+              <button type="button" onclick="bukaModalEditSoal('${s.id}')" class="text-xs px-2.5 py-1 rounded bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold">
+                Edit Teks / Foto
               </button>
-              <button type="button" onclick="hapusSoal('${s.id}')" class="text-xs text-red-600 hover:underline font-semibold">Hapus Soal</button>
+              <button type="button" onclick="hapusSoal('${s.id}')" class="text-xs text-red-600 hover:underline font-semibold">Hapus</button>
             </div>
           </div>
           ${s.imageData ? `<img src="${s.imageData}" class="max-h-36 rounded border" />` : ''}
@@ -2155,6 +2213,7 @@ A: Medan
 B: Banda Aceh
 C: Padang
 D: Pekanbaru
+KUNCI: B
 
 SOAL: Jelaskan secara singkat pengertian ekosistem!
 TIPE: URAIAN`;
@@ -2186,7 +2245,7 @@ TIPE: URAIAN`;
             const baris = blok.split('\n').map(b => b.trim()).filter(Boolean);
             if (baris.length === 0) return;
 
-            let pertanyaan = '', tipe = 'PG', opsiA = '', opsiB = '', opsiC = '', opsiD = '';
+            let pertanyaan = '', tipe = 'PG', opsiA = '', opsiB = '', opsiC = '', opsiD = '', kunci = '';
             baris.forEach(line => {
               if (/^SOAL\s*:/i.test(line)) pertanyaan = line.replace(/^SOAL\s*:/i, '').trim();
               else if (/^TIPE\s*:/i.test(line)) tipe = line.replace(/^TIPE\s*:/i, '').trim().toUpperCase();
@@ -2194,6 +2253,10 @@ TIPE: URAIAN`;
               else if (/^B\s*:/i.test(line)) opsiB = line.replace(/^B\s*:/i, '').trim();
               else if (/^C\s*:/i.test(line)) opsiC = line.replace(/^C\s*:/i, '').trim();
               else if (/^D\s*:/i.test(line)) opsiD = line.replace(/^D\s*:/i, '').trim();
+              else if (/^KUNCI\s*:/i.test(line)) {
+                const k = line.replace(/^KUNCI\s*:/i, '').trim().toUpperCase();
+                if (['A', 'B', 'C', 'D'].includes(k)) kunci = k;
+              }
             });
 
             if (pertanyaan) {
@@ -2205,7 +2268,7 @@ TIPE: URAIAN`;
                 imageData: '',
                 pertanyaan,
                 opsiA, opsiB, opsiC, opsiD,
-                kunci: ''
+                kunci: tipe === 'PG' ? kunci : ''
               };
               appData.soalList.push(soalImpor);
               if (typeof window.simpanSoalKeFirestore === 'function') {
@@ -2218,7 +2281,7 @@ TIPE: URAIAN`;
           simpanData();
           renderDaftarSoalAdmin();
           renderTabelPaket();
-          alert(`Berhasil mengimpor ${berhasil} butir soal dari file teks (.txt).\nSilakan klik tombol "Edit / Atur Kunci" pada masing-masing soal Pilihan Ganda untuk mengisi kunci jawabannya.`);
+          alert(`Berhasil mengimpor ${berhasil} butir soal dari file teks (.txt).\nSilakan klik huruf A/B/C/D pada setiap soal atau gunakan kolom Input Kunci Massal.`);
           e.target.value = '';
         } catch (err) {
           alert('Gagal membaca file .txt. Pastikan format penulisan teks sesuai contoh.');
@@ -2400,7 +2463,7 @@ TIPE: URAIAN`;
     function salinUrlPublik() {
       const url = document.getElementById('inputUrlPublik').value.trim();
       if (!url) return;
-      navigator.clipboard.writeText(url).then(() => alert('Link ujian berhasil disalin!'));
+      salinTeksKeClipboard(url);
     }
 
     function simpanPengaturanSistem() {
