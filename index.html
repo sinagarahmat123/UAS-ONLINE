@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CBT Ujian Semester - UPTD SPF SMP N 1 KUTA BAHARU</title>
+  <title>Ujian Akhir Semester Berbasis Online - UPTD SPF SMP N 1 KUTA BAHARU</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -33,12 +33,23 @@
   <header class="bg-blue-900 text-white shadow-md sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-amber-400 text-blue-950 font-extrabold flex items-center justify-center text-lg shadow">
-          CBT
+        <div class="w-11 h-11 rounded-lg bg-amber-400 text-blue-950 flex items-center justify-center shadow" title="Lambang Topi SMP">
+          <svg viewBox="0 0 64 48" class="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Mahkota Topi SMP Biru Dongker -->
+            <path d="M12 27C12 15.5 21 9 32 9C43 9 52 15.5 52 27H12Z" fill="#1e3a8a" stroke="#0f172a" stroke-width="2"/>
+            <!-- Garis Jahitan Topi -->
+            <path d="M32 9V27" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M22 12C20 17 19 22 19 27" stroke="#60a5fa" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M42 12C44 17 45 22 45 27" stroke="#60a5fa" stroke-width="1.2" stroke-linecap="round"/>
+            <!-- Emblem / Lambang OSIS SMP di Tengah Topi -->
+            <circle cx="32" cy="19.5" r="3.8" fill="#facc15" stroke="#0f172a" stroke-width="1.2"/>
+            <!-- Pet / Lidah Topi SMP -->
+            <path d="M9 27H55L59 33.5C50 36.5 14 36.5 5 33.5L9 27Z" fill="#172554" stroke="#0f172a" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
         </div>
         <div>
           <p class="text-xs uppercase tracking-wider text-blue-200 font-semibold">UPTD SPF SMP N 1 KUTA BAHARU</p>
-          <h1 class="text-lg md:text-xl font-bold leading-tight">UJIAN SEMESTER BERBASIS KOMPUTER</h1>
+          <h1 class="text-lg md:text-xl font-bold leading-tight">UJIAN AKHIR SEMESTER BERBASIS ONLINE</h1>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -120,7 +131,7 @@
           </div>
 
           <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-950 space-y-1.5">
-            <p class="font-bold text-sm text-amber-900">Ketentuan Ujian Berbasis Komputer:</p>
+            <p class="font-bold text-sm text-amber-900">Ketentuan Ujian Akhir Semester Berbasis Online:</p>
             <ol class="list-decimal ml-4 space-y-1">
               <li>Ujian berjalan dalam mode layar penuh dan memantau perpindahan tab/keluar aplikasi (batas peringatan <strong id="teksBatasTabInfo">3 kali</strong>; pelanggaran maksimal mengunci ujian otomatis).</li>
               <li>Aktivitas menyalin teks (<em>copy-paste</em>), klik kanan, dan tangkapan layar (<em>screenshot</em>) diblokir selama ujian berlangsung.</li>
@@ -379,7 +390,7 @@
           <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
             <div class="text-xs text-blue-950 max-w-2xl">
               <p class="font-bold text-sm text-blue-900">Impor Soal dari File Teks (.txt)</p>
-              <p class="mt-0.5">Format per blok soal dipisahkan baris kosong: <code>SOAL: ...</code>, <code>TIPE: PG | ISIAN | URAIAN</code>, dan <code>A: ...</code> s.d <code>D: ...</code> (opsional <code>KUNCI: A</code>). Urutan soal dipertahankan sesuai file dan dapat diatur kunci jawabannya langsung.</p>
+              <p class="mt-0.5">Format per blok soal dipisahkan baris kosong: <code>SOAL: ...</code>, <code>TIPE: PG | ISIAN | URAIAN</code>, dan <code>A: ...</code> s.d <code>D: ...</code> (opsional <code>KUNCI: A</code>). Setelah diimpor, kunci jawaban dapat diklik langsung 1x pada daftar soal atau diisi sekaligus secara massal.</p>
             </div>
             <div class="flex items-center gap-2">
               <button type="button" onclick="unduhContohFormatTeks()" class="px-3 py-2 rounded-lg bg-white border border-blue-300 text-blue-900 text-xs font-semibold hover:bg-blue-100">
@@ -878,6 +889,7 @@
     window.firebaseDb = db;
     window.firestoreSiap = true;
 
+    // Simpan hasil ujian ke koleksi Firestore "rekap_ujian"
     window.simpanRekapKeFirestore = async function(record) {
       if (!record || !record.id) return false;
       try {
@@ -892,6 +904,7 @@
       }
     };
 
+    // Simpan paket ujian ke koleksi Firestore "paket_ujian"
     window.simpanPaketKeFirestore = async function(paket) {
       if (!paket || !paket.id) return false;
       try {
@@ -903,6 +916,7 @@
       }
     };
 
+    // Hapus paket ujian di Firestore
     window.hapusPaketDiFirestore = async function(paketId) {
       if (!paketId) return false;
       try {
@@ -914,6 +928,7 @@
       }
     };
 
+    // Simpan butir soal ke koleksi Firestore "soal_ujian"
     window.simpanSoalKeFirestore = async function(soal) {
       if (!soal || !soal.id) return false;
       try {
@@ -925,6 +940,7 @@
       }
     };
 
+    // Hapus butir soal di Firestore
     window.hapusSoalDiFirestore = async function(soalId) {
       if (!soalId) return false;
       try {
@@ -936,6 +952,7 @@
       }
     };
 
+    // Muat paket_ujian, soal_ujian, dan rekap_ujian dari Firestore
     window.muatDataDariFirestore = async function(tampilkanNotif = false) {
       try {
         const [snapPaket, snapSoal, snapRekap] = await Promise.all([
@@ -962,44 +979,8 @@
 
           if (soalCloud.length > 0) {
             const petaSoal = new Map();
-            // Pertahankan urutan lokal jika tersedia sebagai fallback
-            (window.appData.soalList || []).forEach((s, idx) => {
-              petaSoal.set(s.id, {
-                ...s,
-                order: typeof s.order === 'number' ? s.order : idx
-              });
-            });
-            soalCloud.forEach((s, idx) => {
-              const lama = petaSoal.get(s.id);
-              petaSoal.set(s.id, {
-                ...s,
-                order: typeof s.order === 'number'
-                  ? s.order
-                  : (lama && typeof lama.order === 'number' ? lama.order : idx)
-              });
-            });
-
-            // Kelompokkan per paketId lalu urutkan berdasarkan order
-            const kelompok = new Map();
-            Array.from(petaSoal.values()).forEach((s, idx) => {
-              const key = s.paketId || '__tanpa_paket__';
-              if (!kelompok.has(key)) kelompok.set(key, []);
-              kelompok.get(key).push({
-                ...s,
-                order: typeof s.order === 'number' ? s.order : idx
-              });
-            });
-
-            const hasilUrut = [];
-            kelompok.forEach((items) => {
-              items.sort((a, b) => a.order - b.order);
-              items.forEach((item, indexUrut) => {
-                item.order = indexUrut;
-                hasilUrut.push(item);
-              });
-            });
-
-            window.appData.soalList = hasilUrut;
+            soalCloud.forEach((s) => petaSoal.set(s.id, s));
+            window.appData.soalList = Array.from(petaSoal.values());
           }
 
           if (rekapCloud.length > 0) {
@@ -1032,6 +1013,7 @@
       }
     };
 
+    // Sinkronisasi awal saat halaman dimuat
     window.addEventListener("DOMContentLoaded", () => {
       window.muatDataDariFirestore(false);
     });
@@ -1071,7 +1053,6 @@
         {
           id: 'soal-1795506301674',
           paketId: 'pkt-1795506119589',
-          order: 0,
           jenis: 'PG',
           imageData: '',
           pertanyaan: 'Huruf Jawi untuk bunyi "pa" adalah...',
@@ -1084,7 +1065,6 @@
         {
           id: 'soal-1795506430632',
           paketId: 'pkt-1795506119589',
-          order: 1,
           jenis: 'PG',
           imageData: '',
           pertanyaan: 'Huruf Jawi untuk bunyi "ca" adalah...',
@@ -1097,7 +1077,6 @@
         {
           id: 'soal-1795506720227',
           paketId: 'pkt-1795506158939',
-          order: 0,
           jenis: 'ISIAN',
           imageData: '',
           pertanyaan: 'Siapa nama bupati Aceh Singkil?',
@@ -1131,26 +1110,6 @@
       perbaruiBadgeSync();
     }
     window.simpanData = simpanData;
-
-    // ==================== HELPER URUTAN SOAL ====================
-    function ambilUrutanBerikutnya(paketId) {
-      const soalPaket = appData.soalList.filter(s => s.paketId === paketId);
-      if (soalPaket.length === 0) return 0;
-      const maxOrder = Math.max(...soalPaket.map((s, idx) =>
-        typeof s.order === 'number' ? s.order : idx
-      ));
-      return maxOrder + 1;
-    }
-
-    function getSoalTerurut(paketId) {
-      return appData.soalList
-        .filter(s => s.paketId === paketId)
-        .map((s, idx) => ({
-          ...s,
-          order: typeof s.order === 'number' ? s.order : idx
-        }))
-        .sort((a, b) => a.order - b.order);
-    }
 
     // Sesi Ujian Aktif
     let sesiUjian = null;
@@ -1255,7 +1214,7 @@
         box.classList.add('hidden');
         return;
       }
-      const jmlSoal = getSoalTerurut(paketId).length;
+      const jmlSoal = appData.soalList.filter(s => s.paketId === paketId).length;
       document.getElementById('infoDurasiPaket').textContent = `${paket.durasi} Menit`;
       document.getElementById('infoJumlahSoalPaket').textContent = `${jmlSoal} Butir`;
       box.classList.remove('hidden');
@@ -1305,7 +1264,7 @@
         return;
       }
 
-      const soalPaket = getSoalTerurut(paketId);
+      const soalPaket = appData.soalList.filter(s => s.paketId === paketId);
       if (soalPaket.length === 0) {
         alert('Paket ujian ini belum memiliki butir soal. Hubungi pengawas/admin.');
         return;
@@ -1908,7 +1867,7 @@
         return;
       }
       appData.paketList.forEach(p => {
-        const jml = getSoalTerurut(p.id).length;
+        const jml = appData.soalList.filter(s => s.paketId === p.id).length;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="py-2.5 px-3 font-medium">${escapeHtml(p.kelas)}</td>
@@ -2001,9 +1960,8 @@
       const pertanyaan = document.getElementById('formPertanyaanSoal').value.trim();
 
       const soalBaru = {
-        id: 'soal-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+        id: 'soal-' + Date.now(),
         paketId,
-        order: ambilUrutanBerikutnya(paketId),
         jenis,
         imageData: fotoFormBase64,
         pertanyaan,
@@ -2024,6 +1982,7 @@
       renderTabelPaket();
     }
 
+    // Set kunci jawaban langsung 1 klik dari kartu soal
     function aturKunciCepat(soalId, hurufKunci) {
       const soal = appData.soalList.find(s => s.id === soalId);
       if (!soal || soal.jenis !== 'PG') return;
@@ -2035,6 +1994,7 @@
       renderDaftarSoalAdmin();
     }
 
+    // Terapkan deretan kunci jawaban sekaligus (misal: "A B C D" atau "ABCD")
     function terapkanKunciMassal() {
       const paketId = document.getElementById('selectPaketKelolaSoal').value;
       if (!paketId) return;
@@ -2045,7 +2005,7 @@
         return;
       }
 
-      const daftarPG = getSoalTerurut(paketId).filter(s => s.jenis === 'PG');
+      const daftarPG = appData.soalList.filter(s => s.paketId === paketId && s.jenis === 'PG');
       if (daftarPG.length === 0) {
         alert('Tidak ada soal Pilihan Ganda pada paket ini.');
         return;
@@ -2053,12 +2013,9 @@
 
       const jumlahDiisi = Math.min(raw.length, daftarPG.length);
       for (let i = 0; i < jumlahDiisi; i++) {
-        const targetSoal = appData.soalList.find(s => s.id === daftarPG[i].id);
-        if (targetSoal) {
-          targetSoal.kunci = raw[i];
-          if (typeof window.simpanSoalKeFirestore === 'function') {
-            window.simpanSoalKeFirestore(targetSoal);
-          }
+        daftarPG[i].kunci = raw[i];
+        if (typeof window.simpanSoalKeFirestore === 'function') {
+          window.simpanSoalKeFirestore(daftarPG[i]);
         }
       }
 
@@ -2163,23 +2120,7 @@
 
     function hapusSoal(id) {
       if (!confirm('Hapus butir soal ini?')) return;
-      const target = appData.soalList.find(s => s.id === id);
-      const paketIdTerkait = target ? target.paketId : null;
       appData.soalList = appData.soalList.filter(s => s.id !== id);
-
-      if (paketIdTerkait) {
-        const sisaTerurut = getSoalTerurut(paketIdTerkait);
-        sisaTerurut.forEach((item, indexBaru) => {
-          const asli = appData.soalList.find(x => x.id === item.id);
-          if (asli) {
-            asli.order = indexBaru;
-            if (typeof window.simpanSoalKeFirestore === 'function') {
-              window.simpanSoalKeFirestore(asli);
-            }
-          }
-        });
-      }
-
       simpanData();
       if (typeof window.hapusSoalDiFirestore === 'function') {
         window.hapusSoalDiFirestore(id);
@@ -2201,7 +2142,7 @@
         return;
       }
 
-      const daftar = getSoalTerurut(paketId);
+      const daftar = appData.soalList.filter(s => s.paketId === paketId);
       if (daftar.length === 0) {
         badgeKunci.classList.add('hidden');
         boxMassal.classList.add('hidden');
@@ -2309,7 +2250,6 @@ TIPE: URAIAN`;
         try {
           const isiTeks = ev.target.result.replace(/\r\n/g, '\n');
           const blokList = isiTeks.split(/\n\s*\n/);
-          let urutanBerjalan = ambilUrutanBerikutnya(paketId);
           let berhasil = 0;
 
           blokList.forEach(blok => {
@@ -2333,9 +2273,8 @@ TIPE: URAIAN`;
             if (pertanyaan) {
               if (!['PG', 'ISIAN', 'URAIAN'].includes(tipe)) tipe = 'PG';
               const soalImpor = {
-                id: 'soal-' + Date.now() + '-' + String(urutanBerjalan).padStart(4, '0') + '-' + Math.random().toString(36).slice(2, 5),
+                id: 'soal-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
                 paketId,
-                order: urutanBerjalan++,
                 jenis: tipe,
                 imageData: '',
                 pertanyaan,
@@ -2353,7 +2292,7 @@ TIPE: URAIAN`;
           simpanData();
           renderDaftarSoalAdmin();
           renderTabelPaket();
-          alert(`Berhasil mengimpor ${berhasil} butir soal dari file teks (.txt) sesuai urutan.\nSilakan klik huruf A/B/C/D pada setiap soal atau gunakan kolom Input Kunci Massal.`);
+          alert(`Berhasil mengimpor ${berhasil} butir soal dari file teks (.txt).\nSilakan klik huruf A/B/C/D pada setiap soal atau gunakan kolom Input Kunci Massal.`);
           e.target.value = '';
         } catch (err) {
           alert('Gagal membaca file .txt. Pastikan format penulisan teks sesuai contoh.');
