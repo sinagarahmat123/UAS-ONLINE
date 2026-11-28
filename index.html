@@ -980,7 +980,15 @@
           if (soalCloud.length > 0) {
             const petaSoal = new Map();
             soalCloud.forEach((s) => petaSoal.set(s.id, s));
-            window.appData.soalList = Array.from(petaSoal.values());
+            // Pertahankan urutan lokal yang sudah ada jika belum punya field urutan/order
+            const urutanLokal = new Map();
+            (window.appData.soalList || []).forEach((s, idx) => {
+              urutanLokal.set(s.id, typeof s.urutan === 'number' ? s.urutan : idx);
+            });
+            window.appData.soalList = Array.from(petaSoal.values()).map((s, i) => ({
+              ...s,
+              urutan: typeof s.urutan === 'number' ? s.urutan : (urutanLokal.has(s.id) ? urutanLokal.get(s.id) : 100000 + i)
+            })).sort((a, b) => (a.urutan ?? 0) - (b.urutan ?? 0));
           }
 
           if (rekapCloud.length > 0) {
@@ -1053,6 +1061,7 @@
         {
           id: 'soal-1795506301674',
           paketId: 'pkt-1795506119589',
+          urutan: 1,
           jenis: 'PG',
           imageData: '',
           pertanyaan: 'Huruf Jawi untuk bunyi "pa" adalah...',
@@ -1065,6 +1074,7 @@
         {
           id: 'soal-1795506430632',
           paketId: 'pkt-1795506119589',
+          urutan: 2,
           jenis: 'PG',
           imageData: '',
           pertanyaan: 'Huruf Jawi untuk bunyi "ca" adalah...',
@@ -1077,6 +1087,7 @@
         {
           id: 'soal-1795506720227',
           paketId: 'pkt-1795506158939',
+          urutan: 1,
           jenis: 'ISIAN',
           imageData: '',
           pertanyaan: 'Siapa nama bupati Aceh Singkil?',
@@ -1110,6 +1121,27 @@
       perbaruiBadgeSync();
     }
     window.simpanData = simpanData;
+
+        function ambilSoalPaketTerurut(paketId) {
+      const daftar = ambilSoalPaketTerurut(paketId);
+      return daftar
+        .map((s, idx) => ({
+          ...s,
+          _idxAsli: idx,
+          urutan: typeof s.urutan === 'number' ? s.urutan : idx + 1
+        }))
+        .sort((a, b) => (a.urutan !== b.urutan ? a.urutan - b.urutan : a._idxAsli - b._idxAsli));
+    }
+
+    function normalisasiUrutanPaket(paketId) {
+      const terurut = ambilSoalPaketTerurut(paketId);
+      terurut.forEach((item, i) => {
+        const target = appData.soalList.find(s => s.id === item.id);
+        if (target) {
+          target.urutan = i + 1;
+        }
+      });
+    }
 
     // Sesi Ujian Aktif
     let sesiUjian = null;
@@ -1264,7 +1296,7 @@
         return;
       }
 
-      const soalPaket = appData.soalList.filter(s => s.paketId === paketId);
+      const soalPaket = ambilSoalPaketTerurut(paketId);
       if (soalPaket.length === 0) {
         alert('Paket ujian ini belum memiliki butir soal. Hubungi pengawas/admin.');
         return;
@@ -1959,9 +1991,11 @@
       const jenis = document.getElementById('formJenisSoal').value;
       const pertanyaan = document.getElementById('formPertanyaanSoal').value.trim();
 
+      const urutanBerikutnya = ambilSoalPaketTerurut(paketId).length + 1;
       const soalBaru = {
         id: 'soal-' + Date.now(),
         paketId,
+        urutan: urutanBerikutnya,
         jenis,
         imageData: fotoFormBase64,
         pertanyaan,
@@ -2248,9 +2282,11 @@ TIPE: URAIAN`;
       const reader = new FileReader();
       reader.onload = function(ev) {
         try {
-          const isiTeks = ev.target.result.replace(/\r\n/g, '\n');
+          const isiTeks = ev.target.result.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
           const blokList = isiTeks.split(/\n\s*\n/);
+          let urutanMulai = ambilSoalPaketTerurut(paketId).length;
           let berhasil = 0;
+          const daftarSoalBaru = [];
 
           blokList.forEach(blok => {
             const baris = blok.split('\n').map(b => b.trim()).filter(Boolean);
@@ -2272,22 +2308,34 @@ TIPE: URAIAN`;
 
             if (pertanyaan) {
               if (!['PG', 'ISIAN', 'URAIAN'].includes(tipe)) tipe = 'PG';
+              urutanMulai++;
               const soalImpor = {
-                id: 'soal-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+                id: 'soal-' + Date.now() + '-' + String(urutanMulai).padStart(4, '0') + '-' + Math.random().toString(36).slice(2, 5),
                 paketId,
+                urutan: urutanMulai,
                 jenis: tipe,
                 imageData: '',
                 pertanyaan,
                 opsiA, opsiB, opsiC, opsiD,
                 kunci: tipe === 'PG' ? kunci : ''
               };
-              appData.soalList.push(soalImpor);
-              if (typeof window.simpanSoalKeFirestore === 'function') {
-                window.simpanSoalKeFirestore(soalImpor);
-              }
+              daftarSoalBaru.push(soalImpor);
               berhasil++;
             }
           });
+
+          if (daftarSoalBaru.length > 0) {
+            appData.soalList.push(...daftarSoalBaru);
+            normalisasiUrutanPaket(paketId);
+            simpanData();
+            (async () => {
+              if (typeof window.simpanSoalKeFirestore === 'function') {
+                for (const item of ambilSoalPaketTerurut(paketId)) {
+                  await window.simpanSoalKeFirestore(item);
+                }
+              }
+            })();
+          }
 
           simpanData();
           renderDaftarSoalAdmin();
