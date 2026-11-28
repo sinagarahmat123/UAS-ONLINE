@@ -390,7 +390,7 @@
           <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
             <div class="text-xs text-blue-950 max-w-2xl">
               <p class="font-bold text-sm text-blue-900">Impor Soal dari File Teks (.txt)</p>
-              <p class="mt-0.5">Format per blok soal dipisahkan baris kosong: <code>SOAL: ...</code>, <code>TIPE: PG | ISIAN | URAIAN</code>, dan <code>A: ...</code> s.d <code>D: ...</code> (opsional <code>KUNCI: A</code>). Setelah diimpor, kunci jawaban dapat diklik langsung 1x pada daftar soal atau diisi sekaligus secara massal.</p>
+              <p class="mt-0.5">Pisahkan setiap blok soal dengan baris kosong. Format: <code>SOAL: ...</code>, <code>TIPE: PG | ISIAN | URAIAN</code>, dan <code>A: ...</code> s.d <code>D: ...</code> (tanpa perlu menulis kunci di file `.txt`). Kunci jawaban bisa diklik langsung atau diisi massal setelah diimpor.</p>
             </div>
             <div class="flex items-center gap-2">
               <button type="button" onclick="unduhContohFormatTeks()" class="px-3 py-2 rounded-lg bg-white border border-blue-300 text-blue-900 text-xs font-semibold hover:bg-blue-100">
@@ -889,7 +889,6 @@
     window.firebaseDb = db;
     window.firestoreSiap = true;
 
-    // Simpan hasil ujian ke koleksi Firestore "rekap_ujian"
     window.simpanRekapKeFirestore = async function(record) {
       if (!record || !record.id) return false;
       try {
@@ -904,7 +903,6 @@
       }
     };
 
-    // Simpan paket ujian ke koleksi Firestore "paket_ujian"
     window.simpanPaketKeFirestore = async function(paket) {
       if (!paket || !paket.id) return false;
       try {
@@ -916,7 +914,6 @@
       }
     };
 
-    // Hapus paket ujian di Firestore
     window.hapusPaketDiFirestore = async function(paketId) {
       if (!paketId) return false;
       try {
@@ -928,7 +925,6 @@
       }
     };
 
-    // Simpan butir soal ke koleksi Firestore "soal_ujian"
     window.simpanSoalKeFirestore = async function(soal) {
       if (!soal || !soal.id) return false;
       try {
@@ -940,7 +936,6 @@
       }
     };
 
-    // Hapus butir soal di Firestore
     window.hapusSoalDiFirestore = async function(soalId) {
       if (!soalId) return false;
       try {
@@ -952,7 +947,6 @@
       }
     };
 
-    // Muat paket_ujian, soal_ujian, dan rekap_ujian dari Firestore
     window.muatDataDariFirestore = async function(tampilkanNotif = false) {
       try {
         const [snapPaket, snapSoal, snapRekap] = await Promise.all([
@@ -980,15 +974,18 @@
           if (soalCloud.length > 0) {
             const petaSoal = new Map();
             soalCloud.forEach((s) => petaSoal.set(s.id, s));
-            // Pertahankan urutan lokal yang sudah ada jika belum punya field urutan/order
             const urutanLokal = new Map();
             (window.appData.soalList || []).forEach((s, idx) => {
-              urutanLokal.set(s.id, typeof s.urutan === 'number' ? s.urutan : idx);
+              urutanLokal.set(s.id, typeof s.urutan === 'number' ? s.urutan : idx + 1);
             });
-            window.appData.soalList = Array.from(petaSoal.values()).map((s, i) => ({
-              ...s,
-              urutan: typeof s.urutan === 'number' ? s.urutan : (urutanLokal.has(s.id) ? urutanLokal.get(s.id) : 100000 + i)
-            })).sort((a, b) => (a.urutan ?? 0) - (b.urutan ?? 0));
+            window.appData.soalList = Array.from(petaSoal.values())
+              .map((s, i) => ({
+                ...s,
+                _idx: i,
+                urutan: typeof s.urutan === 'number' ? s.urutan : (urutanLokal.has(s.id) ? urutanLokal.get(s.id) : 100000 + i)
+              }))
+              .sort((a, b) => (a.urutan !== b.urutan ? a.urutan - b.urutan : a._idx - b._idx))
+              .map(({ _idx, ...rest }) => rest);
           }
 
           if (rekapCloud.length > 0) {
@@ -1021,7 +1018,6 @@
       }
     };
 
-    // Sinkronisasi awal saat halaman dimuat
     window.addEventListener("DOMContentLoaded", () => {
       window.muatDataDariFirestore(false);
     });
@@ -1122,15 +1118,16 @@
     }
     window.simpanData = simpanData;
 
-        function ambilSoalPaketTerurut(paketId) {
-      const daftar = ambilSoalPaketTerurut(paketId);
+    function ambilSoalPaketTerurut(paketId) {
+      const daftar = (appData.soalList || []).filter(s => s.paketId === paketId);
       return daftar
         .map((s, idx) => ({
           ...s,
           _idxAsli: idx,
           urutan: typeof s.urutan === 'number' ? s.urutan : idx + 1
         }))
-        .sort((a, b) => (a.urutan !== b.urutan ? a.urutan - b.urutan : a._idxAsli - b._idxAsli));
+        .sort((a, b) => (a.urutan !== b.urutan ? a.urutan - b.urutan : a._idxAsli - b._idxAsli))
+        .map(({ _idxAsli, ...rest }) => rest);
     }
 
     function normalisasiUrutanPaket(paketId) {
@@ -2007,6 +2004,7 @@
       };
 
       appData.soalList.push(soalBaru);
+      normalisasiUrutanPaket(paketId);
       simpanData();
       if (typeof window.simpanSoalKeFirestore === 'function') {
         window.simpanSoalKeFirestore(soalBaru);
@@ -2016,7 +2014,6 @@
       renderTabelPaket();
     }
 
-    // Set kunci jawaban langsung 1 klik dari kartu soal
     function aturKunciCepat(soalId, hurufKunci) {
       const soal = appData.soalList.find(s => s.id === soalId);
       if (!soal || soal.jenis !== 'PG') return;
@@ -2028,7 +2025,6 @@
       renderDaftarSoalAdmin();
     }
 
-    // Terapkan deretan kunci jawaban sekaligus (misal: "A B C D" atau "ABCD")
     function terapkanKunciMassal() {
       const paketId = document.getElementById('selectPaketKelolaSoal').value;
       if (!paketId) return;
@@ -2039,7 +2035,7 @@
         return;
       }
 
-      const daftarPG = appData.soalList.filter(s => s.paketId === paketId && s.jenis === 'PG');
+      const daftarPG = ambilSoalPaketTerurut(paketId).filter(s => s.jenis === 'PG');
       if (daftarPG.length === 0) {
         alert('Tidak ada soal Pilihan Ganda pada paket ini.');
         return;
@@ -2047,9 +2043,12 @@
 
       const jumlahDiisi = Math.min(raw.length, daftarPG.length);
       for (let i = 0; i < jumlahDiisi; i++) {
-        daftarPG[i].kunci = raw[i];
-        if (typeof window.simpanSoalKeFirestore === 'function') {
-          window.simpanSoalKeFirestore(daftarPG[i]);
+        const target = appData.soalList.find(s => s.id === daftarPG[i].id);
+        if (target) {
+          target.kunci = raw[i];
+          if (typeof window.simpanSoalKeFirestore === 'function') {
+            window.simpanSoalKeFirestore(target);
+          }
         }
       }
 
@@ -2154,7 +2153,10 @@
 
     function hapusSoal(id) {
       if (!confirm('Hapus butir soal ini?')) return;
+      const target = appData.soalList.find(s => s.id === id);
+      const paketId = target ? target.paketId : null;
       appData.soalList = appData.soalList.filter(s => s.id !== id);
+      if (paketId) normalisasiUrutanPaket(paketId);
       simpanData();
       if (typeof window.hapusSoalDiFirestore === 'function') {
         window.hapusSoalDiFirestore(id);
@@ -2176,7 +2178,7 @@
         return;
       }
 
-      const daftar = appData.soalList.filter(s => s.paketId === paketId);
+      const daftar = ambilSoalPaketTerurut(paketId);
       if (daftar.length === 0) {
         badgeKunci.classList.add('hidden');
         boxMassal.classList.add('hidden');
@@ -2258,7 +2260,6 @@ A: Medan
 B: Banda Aceh
 C: Padang
 D: Pekanbaru
-KUNCI: B
 
 SOAL: Jelaskan secara singkat pengertian ekosistem!
 TIPE: URAIAN`;
@@ -2292,7 +2293,7 @@ TIPE: URAIAN`;
             const baris = blok.split('\n').map(b => b.trim()).filter(Boolean);
             if (baris.length === 0) return;
 
-            let pertanyaan = '', tipe = 'PG', opsiA = '', opsiB = '', opsiC = '', opsiD = '', kunci = '';
+            let pertanyaan = '', tipe = 'PG', opsiA = '', opsiB = '', opsiC = '', opsiD = '';
             baris.forEach(line => {
               if (/^SOAL\s*:/i.test(line)) pertanyaan = line.replace(/^SOAL\s*:/i, '').trim();
               else if (/^TIPE\s*:/i.test(line)) tipe = line.replace(/^TIPE\s*:/i, '').trim().toUpperCase();
@@ -2300,10 +2301,6 @@ TIPE: URAIAN`;
               else if (/^B\s*:/i.test(line)) opsiB = line.replace(/^B\s*:/i, '').trim();
               else if (/^C\s*:/i.test(line)) opsiC = line.replace(/^C\s*:/i, '').trim();
               else if (/^D\s*:/i.test(line)) opsiD = line.replace(/^D\s*:/i, '').trim();
-              else if (/^KUNCI\s*:/i.test(line)) {
-                const k = line.replace(/^KUNCI\s*:/i, '').trim().toUpperCase();
-                if (['A', 'B', 'C', 'D'].includes(k)) kunci = k;
-              }
             });
 
             if (pertanyaan) {
@@ -2316,8 +2313,11 @@ TIPE: URAIAN`;
                 jenis: tipe,
                 imageData: '',
                 pertanyaan,
-                opsiA, opsiB, opsiC, opsiD,
-                kunci: tipe === 'PG' ? kunci : ''
+                opsiA,
+                opsiB,
+                opsiC,
+                opsiD,
+                kunci: ''
               };
               daftarSoalBaru.push(soalImpor);
               berhasil++;
@@ -2328,21 +2328,22 @@ TIPE: URAIAN`;
             appData.soalList.push(...daftarSoalBaru);
             normalisasiUrutanPaket(paketId);
             simpanData();
+            const soalTerurutSimpan = ambilSoalPaketTerurut(paketId);
             (async () => {
               if (typeof window.simpanSoalKeFirestore === 'function') {
-                for (const item of ambilSoalPaketTerurut(paketId)) {
+                for (const item of soalTerurutSimpan) {
                   await window.simpanSoalKeFirestore(item);
                 }
               }
             })();
           }
 
-          simpanData();
           renderDaftarSoalAdmin();
           renderTabelPaket();
-          alert(`Berhasil mengimpor ${berhasil} butir soal dari file teks (.txt).\nSilakan klik huruf A/B/C/D pada setiap soal atau gunakan kolom Input Kunci Massal.`);
+          alert(`Berhasil mengimpor ${berhasil} butir soal dari file teks (.txt) sesuai urutan.\nSilakan masukkan kunci jawaban langsung pada daftar soal atau gunakan kolom Input Kunci Massal.`);
           e.target.value = '';
         } catch (err) {
+          console.error(err);
           alert('Gagal membaca file .txt. Pastikan format penulisan teks sesuai contoh.');
         }
       };
